@@ -22,7 +22,15 @@
 
 </main>
 
-<style>
+<style global lang="postcss">
+	/* only apply purgecss on utilities, per Tailwind docs */
+	/* purgecss start ignore */
+	@tailwind base;
+	@tailwind components;
+	/* purgecss end ignore */
+
+	@tailwind utilities;
+
 	main {
 		text-align: center;
 		padding: 1em;
