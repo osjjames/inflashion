@@ -1,15 +1,19 @@
 <script lang="ts">
 	import Slider from './components/input/Slider.svelte';
 	import AgentGrid from "./components/AgentGrid.svelte";
+	import BellCurve from "./components/charts/BellCurve.svelte";
 
 	let population: number = 50;
 	const maxPopulation = 500;
 </script>
 
-<main>
+<main class="h-screen w-screen">
 	<h1>Flash inflation</h1>
 	<Slider inputClass="w-96" min="0" max={maxPopulation} step="1" bind:value={population}></Slider>
 	<AgentGrid {population} {maxPopulation}/>
+	<div class="h-2/6 w-full">
+		<BellCurve/>
+	</div>
 </main>
 
 <style global lang="postcss">
