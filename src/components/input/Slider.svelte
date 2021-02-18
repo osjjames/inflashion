@@ -3,8 +3,23 @@
     export let max: number;
     export let step: number;
     export let value: number;
-
+    export let log: boolean = false;
     export let inputClass: string;
+
+    // const logslider(value) {
+    //     // position will be between 0 and 100
+    //     var minp = min;
+    //     var maxp = max;
+    //
+    //     // The result should be between 100 an 10000000
+    //     var minv = Math.log(100);
+    //     var maxv = Math.log(10000000);
+    //
+    //     // calculate adjustment factor
+    //     var scale = (maxv-minv) / (maxp-minp);
+    //
+    //     return Math.exp(minv + scale*(position-minp));
+    // }
 </script>
 
 <label for="slider">

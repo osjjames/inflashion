@@ -2,30 +2,20 @@
     import {Chart, Box, Grid, Svg, SvgLine} from '@sveltejs/pancake';
     import gaussian from 'gaussian';
 
-    const xMax = 100;
-    const yMax = 100;
+    const xMax = 50;
+    const yMax = 1;
 
-    const mu = 0.5;
-    const sigma = 0.05;
-    const distribution = gaussian(mu,sigma);
-    const probMax = distribution.pdf(mu);
-    const gaussianPoints = Array.from(Array(xMax+1).keys()).map(i => ({
-        x: i,
-        y: distribution.pdf(i/xMax) * (yMax/probMax)
-    }));
-    const points = [
-        { x: 0,  y: 0 },
-        { x: 1,  y: 1 },
-        { x: 2,  y: 4 },
-        { x: 3,  y: 9 },
-        { x: 4,  y: 16 },
-        { x: 5,  y: 25 },
-        { x: 6,  y: 36 },
-        { x: 7,  y: 49 },
-        { x: 8,  y: 64 },
-        { x: 9,  y: 81 },
-        { x: 10, y: 100 }
-    ];
+    export let mu: number = 0.5;
+    export let sigma: number = 0.05;
+    let gaussianPoints = [];
+    $: {
+        const distribution = gaussian(mu,sigma);
+        const probMax = distribution.pdf(mu);
+        gaussianPoints = Array.from(Array(xMax+1).keys()).map(i => ({
+            x: i,
+            y: distribution.pdf(i/xMax) * (yMax/probMax)
+        }));
+    }
 </script>
 
 <div class="chart">
@@ -34,13 +24,13 @@
             <div class="axes"></div>
         </Box>
 
-        <Grid vertical count={5} let:value>
-            <span class="x label">{value}</span>
+        <Grid vertical count={1} let:value>
+            <span class="x label">{value/xMax}</span>
         </Grid>
 
-        <Grid horizontal count={3} let:value let:first>
-            <span class="y label">{value}</span>
-        </Grid>
+<!--        <Grid horizontal count={3} let:value let:first>-->
+<!--            <span class="y label">{value}</span>-->
+<!--        </Grid>-->
 
         <Svg>
             <SvgLine data={gaussianPoints} let:d>
