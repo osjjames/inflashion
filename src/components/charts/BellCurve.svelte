@@ -1,6 +1,7 @@
 <script lang="ts">
     import {Chart, Box, Grid, Svg, SvgLine} from '@sveltejs/pancake';
     import gaussian from 'gaussian';
+    import SvgSmoothLine from "./pancakeExtensions/SvgSmoothLine.svelte";
 
     const xMax = 50;
     const yMax = 1;
@@ -9,33 +10,33 @@
     export let sigma: number = 0.05;
     let gaussianPoints = [];
     $: {
-        const distribution = gaussian(mu,sigma);
+        const distribution = gaussian(mu, sigma);
         const probMax = distribution.pdf(mu);
-        gaussianPoints = Array.from(Array(xMax+1).keys()).map(i => ({
+        gaussianPoints = Array.from(Array(xMax + 1).keys()).map(i => ({
             x: i,
-            y: distribution.pdf(i/xMax) * (yMax/probMax)
+            y: distribution.pdf(i / xMax) * (yMax / probMax)
         }));
     }
 </script>
 
-<div class="chart">
+<div class="h-full p-2">
     <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
-        <Box x2={xMax} y2={yMax}>
-            <div class="axes"></div>
-        </Box>
+<!--        <Box x2={xMax} y2={yMax}>-->
+<!--            <div class="axes"></div>-->
+<!--        </Box>-->
 
-        <Grid vertical count={1} let:value>
-            <span class="x label">{value/xMax}</span>
-        </Grid>
+<!--        <Grid vertical count={1} let:value>-->
+<!--            <span class="x label">{value/xMax}</span>-->
+<!--        </Grid>-->
 
 <!--        <Grid horizontal count={3} let:value let:first>-->
 <!--            <span class="y label">{value}</span>-->
 <!--        </Grid>-->
 
         <Svg>
-            <SvgLine data={gaussianPoints} let:d>
+            <SvgSmoothLine data={gaussianPoints} let:d>
                 <path class="data" {d}/>
-            </SvgLine>
+            </SvgSmoothLine>
         </Svg>
     </Chart>
 </div>
@@ -72,10 +73,10 @@
     }
 
     path.data {
-        stroke: red;
+        @apply text-flash-pink stroke-current;
         stroke-linejoin: round;
         stroke-linecap: round;
-        stroke-width: 2px;
+        stroke-width: 4px;
         fill: none;
     }
 </style>
