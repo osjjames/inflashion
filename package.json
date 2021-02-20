@@ -31,6 +31,7 @@
     "@sveltejs/pancake": "^0.0.17",
     "distributions-truncated-normal-pdf": "^0.0.0",
     "gaussian": "^1.2.0",
-    "sirv-cli": "^1.0.0"
+    "sirv-cli": "^1.0.0",
+    "svelte-icons": "^2.1.0"
   }
 }

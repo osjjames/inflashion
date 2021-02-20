@@ -5,7 +5,7 @@
     import pdf from 'distributions-truncated-normal-pdf';
     import {randomTrunc} from "../../utils/probability";
 
-    const xMax = 50;
+    const xMax = 200;
     const yMax = 1;
 
     export let mu: number = 0.5;
