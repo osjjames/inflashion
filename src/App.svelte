@@ -1,18 +1,9 @@
 <script lang="ts">
-	import Slider from './components/input/Slider.svelte';
-	import AgentGrid from "./components/AgentGrid.svelte";
-	import BellCurve from "./components/charts/BellCurve.svelte";
-	import BellCurveController from "./components/charts/BellCurveController.svelte";
-
-	let population: number = 50;
-	const maxPopulation = 500;
+	import Page from "./Page.svelte";
 </script>
 
 <main class="h-screen w-screen">
-	<h1>Flash inflation</h1>
-	<Slider inputClass="w-96" min="0" max={maxPopulation} step="1" bind:value={population}></Slider>
-	<AgentGrid {population} {maxPopulation}/>
-	<BellCurveController/>
+	<Page/>
 </main>
 
 <style global lang="postcss">
@@ -29,14 +20,15 @@
 			@apply font-normal;
 			@apply bg-flash-gray-900;
 			@apply text-flash-gray-50;
+			@apply p-0;
 		}
 	}
 
 	main {
 		text-align: center;
-		padding: 1em;
 		max-width: 240px;
 		margin: 0 auto;
+		box-sizing: border-box;
 	}
 
 	@media (min-width: 640px) {

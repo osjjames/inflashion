@@ -7,7 +7,7 @@
     $: remainder = population % peoplePerRow;
 </script>
 
-<div class="text-left">
+<div class="text-right">
     {#each Array(numberOfRows) as _, i}
         {#each Array(i === numberOfRows - 1 && remainder !== 0 ? remainder : peoplePerRow) as _,j}
             <span>o</span>
