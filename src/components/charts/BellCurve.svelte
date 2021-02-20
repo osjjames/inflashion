@@ -45,25 +45,15 @@
 </script>
 
 <div class="h-full p-2">
-    <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
-<!--        <Box x2={xMax} y2={yMax}>-->
-<!--            <div class="axes"></div>-->
-<!--        </Box>-->
-
-<!--        <Grid vertical count={1} let:value>-->
-<!--            <span class="x label">{value/xMax}</span>-->
-<!--        </Grid>-->
-
-<!--        <Grid horizontal count={3} let:value let:first>-->
-<!--            <span class="y label">{value}</span>-->
-<!--        </Grid>-->
-
-        <Svg>
-            <SvgSmoothLine data={gaussianPoints} let:d>
-                <path class="data" {d}/>
-            </SvgSmoothLine>
-        </Svg>
-    </Chart>
+    <div class="h-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl p-0.5 pt-2">
+        <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
+            <Svg>
+                <SvgSmoothLine data={gaussianPoints} let:d>
+                    <path class="data" {d}/>
+                </SvgSmoothLine>
+            </Svg>
+        </Chart>
+    </div>
 </div>
 
 <style>

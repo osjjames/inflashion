@@ -1,10 +1,22 @@
 <script lang="ts">
     import FaUserAlt from 'svelte-icons/fa/FaUserAlt.svelte';
     import IoMdPerson from 'svelte-icons/io/IoMdPerson.svelte';
+    import tippy from "sveltejs-tippy";
 
+    export let name = 'Agent';
     let widthClass = '8';
+
+    const props = {
+        allowHTML: true,
+        content: "<div class='tooltip w-32'>" +
+             `<div class="text-center"><b>${name}</b></div>` +
+            "<div class=\"text-center\"><em>(click for details)</em></div>" +
+            "</div>",
+        placement: "top",
+        duration: 100,
+    };
 </script>
 
-<div class={`w-${widthClass} h-${widthClass}`}>
+<div class={`w-${widthClass} h-${widthClass}`} use:tippy={props}>
     <IoMdPerson/>
 </div>
