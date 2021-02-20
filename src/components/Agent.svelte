@@ -5,6 +5,7 @@
 
     export let name = 'Agent';
     let widthClass = '8';
+    let selected: boolean = false;
 
     const props = {
         allowHTML: true,
@@ -17,6 +18,12 @@
     };
 </script>
 
-<div class={`w-${widthClass} h-${widthClass}`} use:tippy={props}>
+<div class={`w-${widthClass} h-${widthClass}`} use:tippy={props} class:selected on:click={() => selected = !selected}>
     <IoMdPerson/>
 </div>
+
+<style>
+    .selected {
+        @apply border-2 border-flash-gray-50 rounded-full overflow-hidden
+    }
+</style>

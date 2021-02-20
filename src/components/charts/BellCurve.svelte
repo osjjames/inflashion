@@ -45,7 +45,7 @@
 </script>
 
 <div class="h-full p-2">
-    <div class="h-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl p-0.5 pt-2">
+    <div class="h-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden">
         <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
             <Svg>
                 <SvgSmoothLine data={gaussianPoints} let:d>
