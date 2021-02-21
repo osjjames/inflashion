@@ -15,29 +15,35 @@ export type SimulationParameters = {
 type SimulationProps = {
     totalSupply: number,
     population: number,
-    parameters: SimulationParameters
+    parameters: SimulationParameters,
+    initialDay: Day
 }
 export class Simulation {
     private _agents: Array<Agent>;
     private _parameters: SimulationParameters;
     private _protocol: Protocol;
+    private _today: Day;
 
     constructor(props: SimulationProps) {
         this._agents = initialiseAgents(props.population, props.totalSupply);
         this._parameters = props.parameters;
         this._protocol = new Protocol({totalSupply: props.totalSupply});
+        this._today = props.initialDay;
     }
 
-    get agents() {return this.agents}
-    get parameters() {return this.parameters}
-    get protocol() {return this.protocol}
+    get agents() {return this._agents}
+    get parameters() {return this._parameters}
+    get protocol() {return this._protocol}
+    get today() {return this._today}
 
-    public startDay = (day: Day) => {
+    public beginDay = (): Simulation => {
         for (let agent of this._agents) {
-            const actions = agent.dailyCheck(day, this);
+            const actions = agent.dailyCheck(this._today, this);
             for (let action of actions) {
                 this._protocol.registerAgentAction(action);
             }
         }
+        this._today += 1;
+        return this;
     }
 }

@@ -65,7 +65,7 @@ export class Agent {
 
         if (this._activeStake === null) {
             const stake = new Stake({
-                amount: Math.ceil(randomTrunc(simulation.parameters.stakeProportion) * this._holdings),
+                amount: Math.round(randomTrunc(simulation.parameters.stakeProportion) * this._holdings),
                 duration: Math.ceil(randomTrunc(simulation.parameters.stakeDuration) * MAX_STAKE_DURATION),
                 startDay: today,
                 fpy: simulation.protocol.fpy

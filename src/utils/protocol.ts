@@ -1,4 +1,4 @@
-import {AgentAction} from "./agent";
+import type {AgentAction} from "./agent";
 
 export type Day = number;
 
@@ -57,9 +57,9 @@ export class Protocol {
         this._fpy = 0.5;
     }
 
-    get totalSupply() {return this.totalSupply}
-    get totalStaked() {return this.totalStaked}
-    get fpy() {return this.fpy}
+    get totalSupply() {return this._totalSupply}
+    get totalStaked() {return this._totalStaked}
+    get fpy() {return this._fpy}
 
     private registerStake = (stake: Stake) => {
         this._fpy = (1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2;
@@ -86,8 +86,7 @@ export class Protocol {
                 break;
             case "STAKE_END":
                 this.registerStakeEnd(action.payload);
-            default:
-                throw new Error(`Action type ${action.type} not recognised`);
+                break;
         }
     }
 }
