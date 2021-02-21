@@ -1,14 +1,16 @@
+export type Day = number;
+
 export type Stake = {
     amount: number,
     duration: number,
-    startDay: number,
-    endDay: number,
+    startDay: Day,
+    endDay: Day,
     flashYield: number
 }
 
 export type Unstake = {
     stake: Stake,
-    day: number,
+    day: Day,
     burned: number
 }
 
@@ -18,7 +20,7 @@ export type Protocol = {
     fpy: number
 }
 
-const stake = (amount: number, duration: number, protocol: Protocol, currentDay: number): Stake => ({
+const stake = (amount: number, duration: number, protocol: Protocol, currentDay: Day): Stake => ({
     amount,
     duration,
     startDay: currentDay,
@@ -26,28 +28,28 @@ const stake = (amount: number, duration: number, protocol: Protocol, currentDay:
     flashYield: (amount * duration * protocol.fpy) / 365
 });
 
-const unstake = (stake: Stake, protocol: Protocol, currentDay: number): Unstake => ({
+const unstake = (stake: Stake, protocol: Protocol, currentDay: Day): Unstake => ({
     stake,
     day: currentDay,
     burned: ((stake.amount * (currentDay - stake.startDay)) / stake.duration) * ((protocol.totalStaked - stake.amount) / protocol.totalSupply)
 });
 
-const updateProtocolFromStake = (protocol: Protocol, stake: Stake): Protocol => ({
+export const updateProtocolFromStake = (stake: Stake) => (protocol: Protocol): Protocol => ({
     totalSupply: protocol.totalSupply + stake.flashYield,
     totalStaked: protocol.totalStaked + stake.amount,
     fpy: (1 - ((protocol.totalStaked + stake.amount) / protocol.totalSupply)) / 2
 });
 
-const updateProtocolFromUnstake = (protocol: Protocol, unstake: Unstake): Protocol => ({
+export const updateProtocolFromUnstake = (unstake: Unstake) => (protocol: Protocol): Protocol => ({
     totalSupply: protocol.totalSupply - unstake.burned,
     totalStaked: protocol.totalStaked - unstake.stake.amount,
     fpy: protocol.fpy
 });
 
-const updateProtocolFromStakeEnd = (protocol: Protocol, stake: Stake): Protocol => ({
+export const updateProtocolFromStakeEnd = (stake: Stake) => (protocol: Protocol): Protocol => ({
     totalSupply: protocol.totalSupply,
     totalStaked: protocol.totalStaked - stake.amount,
     fpy: protocol.fpy
 });
 
-const remainingStakeDuration = (stake: Stake, currentDay: number) => stake.endDay - currentDay;
+const remainingStakeDuration = (stake: Stake, currentDay: Day) => stake.endDay - currentDay;
