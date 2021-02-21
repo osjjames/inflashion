@@ -1,6 +1,6 @@
 <script lang="ts">
     import FaUserAlt from 'svelte-icons/fa/FaUserAlt.svelte';
-    import Agent from "./Agent.svelte";
+    import AgentCell from "./AgentCell.svelte";
     import { scale, fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
 
@@ -15,7 +15,7 @@
 <div class={`grid box-border`} style={`grid-template-columns: repeat(${peoplePerRow}, minmax(0, 1fr))`}>
     {#each Array(population) as _,i}
         <div transition:scale="{{duration: 200}}">
-            <Agent/>
+            <AgentCell/>
         </div>
     {/each}
     {#each Array(peoplePerRow-remainder) as _,k}
