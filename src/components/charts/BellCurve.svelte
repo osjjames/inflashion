@@ -15,7 +15,7 @@
     const chartPointsFromSamples = (mu: number, sigma: number, samples: number = 1000): Array<{x: number, y: number}> => {
         const data = [];
         for (let i = 0; i < samples; i++) {
-            data.push(randomTrunc({range: [0, 1], mu, sigma}));
+            data.push(randomTrunc({bounds: {lower: 0, upper: 1}, mu, sigma}));
         }
         let bins: number[] = new Array(xMax + 1).fill(0)
         for (let value of data) {

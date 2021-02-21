@@ -1,55 +1,93 @@
+import {AgentAction} from "./agent";
+
 export type Day = number;
 
-export type Stake = {
+type StakeProps = {
     amount: number,
     duration: number,
     startDay: Day,
-    endDay: Day,
-    flashYield: number
-}
-
-export type Unstake = {
-    stake: Stake,
-    day: Day,
-    burned: number
-}
-
-export type Protocol = {
-    totalSupply: number,
-    totalStaked: number,
     fpy: number
 }
+export class Stake {
+    readonly amount: number;
+    readonly duration: number;
+    readonly startDay: Day;
+    readonly endDay: Day;
+    readonly flashYield: number;
 
-const stake = (amount: number, duration: number, protocol: Protocol, currentDay: Day): Stake => ({
-    amount,
-    duration,
-    startDay: currentDay,
-    endDay: currentDay + duration,
-    flashYield: (amount * duration * protocol.fpy) / 365
-});
+    constructor(props: StakeProps) {
+        this.amount = props.amount;
+        this.duration = props.duration;
+        this.startDay = props.startDay;
+        this.endDay = props.startDay + props.duration;
+        this.flashYield = (props.amount * props.duration * props.fpy) / 365
+    }
+}
 
-const unstake = (stake: Stake, protocol: Protocol, currentDay: Day): Unstake => ({
-    stake,
-    day: currentDay,
-    burned: ((stake.amount * (currentDay - stake.startDay)) / stake.duration) * ((protocol.totalStaked - stake.amount) / protocol.totalSupply)
-});
+type UnstakeProps = {
+    stake: Stake,
+    day: Day,
+    totalStaked: number,
+    totalSupply: number
+}
+export class Unstake {
+    readonly stake: Stake;
+    readonly day: Day;
+    readonly burned: number;
 
-export const updateProtocolFromStake = (stake: Stake) => (protocol: Protocol): Protocol => ({
-    totalSupply: protocol.totalSupply + stake.flashYield,
-    totalStaked: protocol.totalStaked + stake.amount,
-    fpy: (1 - ((protocol.totalStaked + stake.amount) / protocol.totalSupply)) / 2
-});
+    constructor(props: UnstakeProps) {
+        this.stake = props.stake;
+        this.day = props.day;
+        this.burned = ((props.stake.amount * (props.day - props.stake.startDay)) / props.stake.duration) * ((props.totalStaked - props.stake.amount) / props.totalSupply);
+    }
+}
 
-export const updateProtocolFromUnstake = (unstake: Unstake) => (protocol: Protocol): Protocol => ({
-    totalSupply: protocol.totalSupply - unstake.burned,
-    totalStaked: protocol.totalStaked - unstake.stake.amount,
-    fpy: protocol.fpy
-});
+type ProtocolProps = {
+    totalSupply: number
+}
 
-export const updateProtocolFromStakeEnd = (stake: Stake) => (protocol: Protocol): Protocol => ({
-    totalSupply: protocol.totalSupply,
-    totalStaked: protocol.totalStaked - stake.amount,
-    fpy: protocol.fpy
-});
+export class Protocol {
+    private _totalSupply: number;
+    private _totalStaked: number;
+    private _fpy: number;
 
-const remainingStakeDuration = (stake: Stake, currentDay: Day) => stake.endDay - currentDay;
+    constructor(props: ProtocolProps) {
+        this._totalSupply = props.totalSupply;
+        this._totalStaked = 0;
+        this._fpy = 0.5;
+    }
+
+    get totalSupply() {return this.totalSupply}
+    get totalStaked() {return this.totalStaked}
+    get fpy() {return this.fpy}
+
+    private registerStake = (stake: Stake) => {
+        this._fpy = (1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2;
+        this._totalSupply += stake.flashYield;
+        this._totalStaked += stake.amount;
+    }
+
+    private registerUnstake = (unstake: Unstake) => {
+        this._totalSupply -= unstake.burned;
+        this._totalStaked -= unstake.stake.amount;
+    }
+
+    private registerStakeEnd = (stake: Stake) => {
+        this._totalStaked -= stake.amount;
+    }
+
+    public registerAgentAction = (action: AgentAction) => {
+        switch(action.type) {
+            case "STAKE":
+                this.registerStake(action.payload);
+                break;
+            case "UNSTAKE":
+                this.registerUnstake(action.payload);
+                break;
+            case "STAKE_END":
+                this.registerStakeEnd(action.payload);
+            default:
+                throw new Error(`Action type ${action.type} not recognised`);
+        }
+    }
+}

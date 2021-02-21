@@ -1,6 +1,11 @@
 import { writable } from 'svelte/store';
 import type {Protocol, Stake, Unstake} from "../utils/protocol";
-import {updateProtocolFromStake, updateProtocolFromStakeEnd, updateProtocolFromUnstake} from "../utils/protocol";
+import {
+    initialiseProtocol,
+    updateProtocolFromStake,
+    updateProtocolFromStakeEnd,
+    updateProtocolFromUnstake
+} from "../utils/protocol";
 
 function createProtocol(initial: Protocol) {
     const { subscribe, set, update } = writable(initial);
@@ -13,8 +18,4 @@ function createProtocol(initial: Protocol) {
     };
 }
 
-export const protocol = createProtocol({
-    totalSupply: 1000000,
-    totalStaked: 0,
-    fpy: 0.5
-});
+export const protocol = createProtocol(initialiseProtocol(1000000));
