@@ -76,7 +76,7 @@ export class Agent {
                     payload: stake
                 });
             }
-            const queuedUnstakeDay = Math.ceil(randomTrunc(simulation.parameters.stakeCompletion) * stake.duration);
+            const queuedUnstakeDay = today + Math.ceil(randomTrunc(simulation.parameters.stakeCompletion) * stake.duration);
             this.registerStake(stake, queuedUnstakeDay);
         } else if (this._activeStake.endDay === today) {
             actions.push({
