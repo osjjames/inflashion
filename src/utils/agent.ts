@@ -1,7 +1,9 @@
 import type {Day} from "./protocol";
-import type {Simulation} from "./simulation";
+import type {Simulation, SimulationParameters} from "./simulation";
 import {randomTrunc} from "./probability";
 import {Stake, Unstake} from "./protocol";
+import {parameters} from "../store/simulation";
+import {get} from "svelte/store";
 
 type StakeAction = {
     type: 'STAKE',
@@ -60,14 +62,17 @@ export class Agent {
     public dailyCheck = (today: Day, simulation: Simulation): Array<AgentAction> => {
         let actions: Array<AgentAction> = [];
 
+        let currentParameters: SimulationParameters;
+        parameters.subscribe(params => currentParameters = params);
+
         if (this._activeStake === null) {
             const stake = new Stake({
-                amount: Math.round(randomTrunc(simulation.parameters.stakeProportion) * this._holdings),
-                duration: Math.ceil(randomTrunc(simulation.parameters.stakeDuration) * simulation.protocol.maxStakeDuration),
+                amount: Math.round(randomTrunc(currentParameters.stakeProportion) * this._holdings),
+                duration: Math.ceil(randomTrunc(currentParameters.stakeDuration) * simulation.protocol.maxStakeDuration),
                 startDay: today,
                 fpy: simulation.protocol.fpy
             });
-            const queuedUnstakeDay = today + Math.ceil(randomTrunc(simulation.parameters.stakeCompletion) * stake.duration);
+            const queuedUnstakeDay = today + Math.ceil(randomTrunc(currentParameters.stakeCompletion) * stake.duration);
 
             if (stake.duration > 0 && queuedUnstakeDay > today) {
                 if (stake.amount > 0) {

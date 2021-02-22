@@ -2,8 +2,8 @@
     import BellCurve from "./BellCurve.svelte";
     import Slider from "../input/Slider.svelte";
 
-    let mu: number = 0.5;
-    let sigma: number = 0.05;
+    export let mu: number = 0.5;
+    export let sigma: number = 0.05;
     let dimensionsClass: string = '64';
 </script>
 

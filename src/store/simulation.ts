@@ -1,6 +1,7 @@
 import {derived, writable} from 'svelte/store';
-import {Simulation} from "../utils/simulation";
+import {Simulation, SimulationParameters} from "../utils/simulation";
 import type {Day} from "../utils/protocol";
+import type {TruncatedNormalDistribution} from "../utils/probability";
 
 function createSimulation(initial: Simulation) {
     const simStore = writable(initial);
@@ -15,25 +16,35 @@ function createSimulation(initial: Simulation) {
     };
 }
 
+function createParameters(initial: SimulationParameters) {
+    return writable(initial);
+    // const { subscribe, set, update } = paramsStore;
+    //
+    // return {
+    //     subscribe
+    // };
+}
+
 export const simulation = createSimulation(new Simulation({
     totalSupply: 1000000,
     population: 100,
-    parameters: {
-        stakeProportion: {
-            bounds: {lower: 0, upper: 1},
-            mu: 1,
-            sigma: 0
-        },
-        stakeDuration: {
-            bounds: {lower: 0, upper: 1},
-            mu: 1,
-            sigma: 0
-        },
-        stakeCompletion: {
-            bounds: {lower: 0, upper: 1},
-            mu: 0.001,
-            sigma: 0
-        }
-    },
     initialDay: 1
 }));
+
+export const parameters = createParameters({
+    stakeProportion: {
+        bounds: {lower: 0, upper: 1},
+        mu: 1,
+        sigma: 0
+    },
+    stakeDuration: {
+        bounds: {lower: 0, upper: 1},
+        mu: 1,
+        sigma: 0
+    },
+    stakeCompletion: {
+        bounds: {lower: 0, upper: 1},
+        mu: 0.1,
+        sigma: 0.1
+    }
+});

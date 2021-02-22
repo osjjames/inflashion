@@ -12,6 +12,17 @@
     export let sigma: number = 0.05;
     let gaussianPoints = [];
 
+    const pdfZero = (xValues: number | Array<number>, options: {a: number, b: number, mu: number, sigma: number}) => {
+        if (options.sigma === 0) {
+            if (!Array.isArray(xValues)) return xValues === options.mu ? 1 : 0;
+            let target = options.mu;
+            // Get x value that is closest to mu
+            const closest = xValues.reduce((prev, curr) => Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev);
+            return xValues.map(x => x === closest ? 1 : 0);
+        }
+        return pdf(xValues, options);
+    }
+
     const chartPointsFromSamples = (mu: number, sigma: number, samples: number = 1000): Array<{x: number, y: number}> => {
         const data = [];
         for (let i = 0; i < samples; i++) {

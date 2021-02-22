@@ -69,8 +69,6 @@ export class Protocol {
         this._maxStakeDuration = Math.floor((0.5 / this._fpy) * 365);
         this._totalSupply += stake.flashYield;
         this._totalStaked += stake.amount;
-        console.log(this._fpy);
-        console.log(this._maxStakeDuration);
     }
 
     private registerUnstake = (unstake: Unstake) => {
