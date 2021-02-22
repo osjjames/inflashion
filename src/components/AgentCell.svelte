@@ -3,10 +3,16 @@
     import IoMdPerson from 'svelte-icons/io/IoMdPerson.svelte';
     import tippy from "sveltejs-tippy";
     import type {Agent} from "../utils/agent";
+    import {agentDisplay} from "../store/agentDisplay";
 
-    export let agent: Agent;
+    export let agent: Agent = new Agent({name: 'Missing Agent', initialHoldings: 0});
     let widthClass = '8';
-    let selected: boolean = false;
+
+    $: agentDisplayStore = $agentDisplay;
+    $: selected = agent.name === agentDisplayStore.selectedAgentName;
+    const select = () => {
+        agentDisplay.setSelectedAgent(agent.name);
+    };
 
     const props = {
         allowHTML: true,
@@ -19,7 +25,7 @@
     };
 </script>
 
-<div class={`w-${widthClass} h-${widthClass}`} class:staking={agent.activeStake?.amount > 0} use:tippy={props} class:selected on:click={() => selected = !selected}>
+<div class={`w-${widthClass} h-${widthClass} opacity-50`} class:staking={agent.activeStake?.amount > 0} use:tippy={props} class:selected on:click={select}>
     <IoMdPerson/>
 </div>
 
@@ -28,6 +34,6 @@
         @apply border-2 border-flash-gray-50 rounded-full overflow-hidden
     }
     .staking {
-        @apply opacity-50
+        @apply opacity-100
     }
 </style>
