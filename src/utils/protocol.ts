@@ -50,21 +50,27 @@ export class Protocol {
     private _totalSupply: number;
     private _totalStaked: number;
     private _fpy: number;
+    private _maxStakeDuration: number;
 
     constructor(props: ProtocolProps) {
         this._totalSupply = props.totalSupply;
         this._totalStaked = 0;
         this._fpy = 0.5;
+        this._maxStakeDuration = 365;
     }
 
     get totalSupply() {return this._totalSupply}
     get totalStaked() {return this._totalStaked}
     get fpy() {return this._fpy}
+    get maxStakeDuration() {return this._maxStakeDuration}
 
     private registerStake = (stake: Stake) => {
         this._fpy = (1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2;
+        this._maxStakeDuration = Math.floor((0.5 / this._fpy) * 365);
         this._totalSupply += stake.flashYield;
         this._totalStaked += stake.amount;
+        console.log(this._fpy);
+        console.log(this._maxStakeDuration);
     }
 
     private registerUnstake = (unstake: Unstake) => {

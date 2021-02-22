@@ -21,18 +21,18 @@ export const simulation = createSimulation(new Simulation({
     parameters: {
         stakeProportion: {
             bounds: {lower: 0, upper: 1},
-            mu: 0.5,
-            sigma: 1
+            mu: 1,
+            sigma: 0
         },
         stakeDuration: {
             bounds: {lower: 0, upper: 1},
-            mu: 0.5,
-            sigma: 0.5
+            mu: 1,
+            sigma: 0
         },
         stakeCompletion: {
             bounds: {lower: 0, upper: 1},
-            mu: 0.5,
-            sigma: 0.5
+            mu: 0.001,
+            sigma: 0
         }
     },
     initialDay: 1

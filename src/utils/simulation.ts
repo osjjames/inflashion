@@ -4,8 +4,6 @@ import type {Day} from "./protocol";
 import {Protocol} from "./protocol";
 import {initialiseAgents} from "./agent";
 
-export const MAX_STAKE_DURATION = 365;
-
 export type SimulationParameters = {
     stakeProportion: TruncatedNormalDistribution, // Average percentage of net worth staked
     stakeDuration: TruncatedNormalDistribution, // Average duration of stake

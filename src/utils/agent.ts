@@ -1,9 +1,6 @@
-import type {Day, Protocol} from "./protocol";
-import type {Simulation, SimulationParameters} from "./simulation";
-import {simulation} from "../store/simulation";
-import {randomTrunc, TruncatedNormalDistribution} from "./probability";
-import {throwError} from "svelte-preprocess/dist/modules/errors";
-import {MAX_STAKE_DURATION} from "./simulation";
+import type {Day} from "./protocol";
+import type {Simulation} from "./simulation";
+import {randomTrunc} from "./probability";
 import {Stake, Unstake} from "./protocol";
 
 type StakeAction = {
@@ -66,18 +63,21 @@ export class Agent {
         if (this._activeStake === null) {
             const stake = new Stake({
                 amount: Math.round(randomTrunc(simulation.parameters.stakeProportion) * this._holdings),
-                duration: Math.ceil(randomTrunc(simulation.parameters.stakeDuration) * MAX_STAKE_DURATION),
+                duration: Math.ceil(randomTrunc(simulation.parameters.stakeDuration) * simulation.protocol.maxStakeDuration),
                 startDay: today,
                 fpy: simulation.protocol.fpy
             });
-            if (stake.amount > 0) {
-                actions.push({
-                    type: "STAKE",
-                    payload: stake
-                });
-            }
             const queuedUnstakeDay = today + Math.ceil(randomTrunc(simulation.parameters.stakeCompletion) * stake.duration);
-            this.registerStake(stake, queuedUnstakeDay);
+
+            if (stake.duration > 0 && queuedUnstakeDay > today) {
+                if (stake.amount > 0) {
+                    actions.push({
+                        type: "STAKE",
+                        payload: stake
+                    });
+                }
+                this.registerStake(stake, queuedUnstakeDay);
+            }
         } else if (this._activeStake.endDay === today) {
             actions.push({
                 type: "STAKE_END",
