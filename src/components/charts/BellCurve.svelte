@@ -5,23 +5,14 @@
     import pdf from 'distributions-truncated-normal-pdf';
     import {randomTrunc} from "../../utils/probability";
 
-    const xMax = 200;
+    const xMax = 100;
     const yMax = 1;
+
+    const xMaxZero = 1000;
 
     export let mu: number = 0.5;
     export let sigma: number = 0.05;
     let gaussianPoints = [];
-
-    const pdfZero = (xValues: number | Array<number>, options: {a: number, b: number, mu: number, sigma: number}) => {
-        if (options.sigma === 0) {
-            if (!Array.isArray(xValues)) return xValues === options.mu ? 1 : 0;
-            let target = options.mu;
-            // Get x value that is closest to mu
-            const closest = xValues.reduce((prev, curr) => Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev);
-            return xValues.map(x => x === closest ? 1 : 0);
-        }
-        return pdf(xValues, options);
-    }
 
     const chartPointsFromSamples = (mu: number, sigma: number, samples: number = 1000): Array<{x: number, y: number}> => {
         const data = [];
@@ -50,20 +41,41 @@
         }));
     }
 
+    const chartPointsZero = (mu: number): Array<{x: number, y: number}> => {
+        const xValues = Array.from(Array(xMaxZero + 1).keys()).map(n => n/xMaxZero);
+        // Get x value that is closest to mu
+        const closest = xValues.reduce((prev, curr) => Math.abs(curr - mu) < Math.abs(prev - mu) ? curr : prev);
+        const gaussianValues = xValues.map(x => x === closest ? 1 : 0);
+        return gaussianValues.map((value, i) => ({
+            x: i,
+            y: value * yMax
+        }));
+    }
+
     $: {
-        gaussianPoints = chartPointsFromPdf(mu, sigma);
+        gaussianPoints = sigma === 0 ? chartPointsZero(mu) : chartPointsFromPdf(mu, sigma);
     }
 </script>
 
 <div class="h-full p-2">
     <div class="h-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden">
-        <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
-            <Svg>
-                <SvgSmoothLine data={gaussianPoints} let:d>
-                    <path class="data" {d}/>
-                </SvgSmoothLine>
-            </Svg>
-        </Chart>
+        {#if sigma === 0}
+            <Chart x1={0} x2={xMaxZero} y1={0} y2={yMax}>
+                <Svg>
+                    <SvgLine data={gaussianPoints} let:d>
+                        <path class="data" {d}/>
+                    </SvgLine>
+                </Svg>
+            </Chart>
+        {:else}
+            <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
+                <Svg>
+                    <SvgSmoothLine data={gaussianPoints} let:d>
+                        <path class="data" {d}/>
+                    </SvgSmoothLine>
+                </Svg>
+            </Chart>
+        {/if}
     </div>
 </div>
 
