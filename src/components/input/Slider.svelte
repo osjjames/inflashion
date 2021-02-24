@@ -5,6 +5,7 @@
     export let value: number;
     export let log: boolean = false;
     export let inputClass: string;
+    export let elementId: string = 'slider';
 
     // const logslider(value) {
     //     // position will be between 0 and 100
@@ -22,8 +23,8 @@
     // }
 </script>
 
-<label for="slider">
-    <input id="slider" type="range" {min} {max} {step} bind:value
+<label for="{elementId}">
+    <input id="{elementId}" type="range" {min} {max} {step} bind:value
         class={`rounded h-2 border-0 bg-flash-gray-300 focus:outline-none ${inputClass}`}
     />
 </label>
@@ -36,5 +37,11 @@
              -webkit-appearance: none;
              @apply w-4 h-4 bg-gradient-to-r from-flash-pink to-flash-blue cursor-pointer rounded-full;
          }
+
+        &.sigma-slider {
+            @apply mt-12;
+            transform: rotate(270deg);
+            -moz-transform: rotate(270deg); /*do same for other browsers if required*/
+        }
     }
 </style>

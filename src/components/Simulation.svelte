@@ -20,7 +20,7 @@
        timer = new IntervalTimer({
            name: 'simulation',
            callback: simulation.nextDay,
-           interval: 10
+           interval: 500
        });
     });
 </script>
@@ -28,9 +28,9 @@
 <div>
     <span>Day: {sim.today}</span>
     <br/>
-    <span>FPY: {sim.protocol.fpy.toFixed(3)}</span>
+    <span>FPY: {(sim.protocol.fpy*100).toFixed(2)} %</span>
     <br/>
-    <span>Total Supply: {sim.protocol.totalSupply.toFixed(3)}</span>
+    <span>Total Supply: {sim.protocol.totalSupply.toFixed(0)}</span>
     <br/>
     <button class="w-32 h-32" on:click={togglePause}></button>
 </div>
