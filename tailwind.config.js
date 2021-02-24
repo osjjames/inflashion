@@ -21,6 +21,12 @@ module.exports = {
                     '800': '#212025', // lighter bg
                     '900': '#1A191E'  // darker bg
                 }
+            },
+            gridTemplateColumns: {
+                'bc-controller': '4em 1fr',
+            },
+            gridTemplateRows: {
+                'bc-controller': '1fr 2em',
             }
         }
     },

@@ -5,7 +5,7 @@
     export let value: number;
     export let log: boolean = false;
     export let inputClass: string;
-    export let elementId: string = 'slider';
+    export let id: string = 'slider';
 
     // const logslider(value) {
     //     // position will be between 0 and 100
@@ -23,14 +23,14 @@
     // }
 </script>
 
-<label for="{elementId}">
-    <input id="{elementId}" type="range" {min} {max} {step} bind:value
+<label for="{id}">
+    <input id="{id}" type="range" {min} {max} {step} bind:value
         class={`rounded h-2 border-0 bg-flash-gray-300 focus:outline-none ${inputClass}`}
     />
 </label>
 
 <style>
-    #slider {
+    input[type=range] {
         -webkit-appearance: none;
 
         &::-webkit-slider-thumb {

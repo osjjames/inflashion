@@ -8,13 +8,15 @@
     let heightClass: string = '32';
 </script>
 
-<div class={`h-${heightClass} w-${widthClass} mb-8`}>
+<div class={`h-${heightClass} w-${widthClass} mb-8 grid grid-cols-bc-controller grid-rows-bc-controller gap-0`}>
+    <Slider inputClass={`sigma-slider w-24`} min="0" max="1" step="0.001" bind:value={sigma}></Slider>
     <div class="h-full w-full">
         <BellCurve {mu} {sigma}></BellCurve>
     </div>
+    <div></div>
     <Slider inputClass={`mu-slider w-${widthClass}`} min="0" max="1" step="0.01" bind:value={mu}></Slider>
-    <Slider inputClass={`sigma-slider w-${heightClass}`} min="0" max="0.1" step="0.001" bind:value={sigma}></Slider>
 </div>
 
 <style>
+
 </style>
