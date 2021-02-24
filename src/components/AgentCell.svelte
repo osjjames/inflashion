@@ -11,7 +11,7 @@
     $: agentDisplayStore = $agentDisplay;
     $: selected = agent.name === agentDisplayStore.selectedAgentName;
     const select = () => {
-        agentDisplay.setSelectedAgent(agent.name);
+        agentDisplay.setSelectedAgent(selected ? null : agent.name);
     };
 
     const props = {
