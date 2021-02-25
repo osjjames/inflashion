@@ -38,6 +38,7 @@
         &::-webkit-slider-thumb {
              -webkit-appearance: none;
              @apply w-4 h-4 bg-gradient-to-r from-flash-pink to-flash-blue cursor-pointer rounded-full;
+             background: linear-gradient(90deg, #e62b96, #e3339e, #d946b3, #c45ecf, #a178e9, #6e8ff9, #1fa1fd, #00aff6, #00b9ea, #00c0de, #0cc4d5, #24c5d2);
          }
     }
 
