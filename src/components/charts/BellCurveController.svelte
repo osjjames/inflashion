@@ -8,13 +8,19 @@
     let heightClass: string = '32';
 </script>
 
-<div class={`h-${heightClass} w-${widthClass} mb-8 grid grid-cols-bc-controller grid-rows-bc-controller gap-0`}>
-    <Slider inputClass={`sigma-slider w-24`} min="0" max="1" step="0.001" bind:value={sigma}></Slider>
-    <div class="h-full w-full">
-        <BellCurve {mu} {sigma}></BellCurve>
+<div class="flex">
+    <div class={` mb-8 grid grid-cols-bc-controller grid-rows-bc-controller gap-0 box-border`}>
+        <Slider inputClass={`sigma-slider w-24`} min="0" max="1" step="0.001" bind:value={sigma} vertical gaussian></Slider>
+        <div class="h-{heightClass} w-{widthClass}">
+            <BellCurve {mu} {sigma}></BellCurve>
+        </div>
+        <div></div>
+        <Slider inputClass={`mu-slider w-${widthClass}`} min="0" max="1" step="0.01" bind:value={mu} gaussian></Slider>
     </div>
-    <div></div>
-    <Slider inputClass={`mu-slider w-${widthClass}`} min="0" max="1" step="0.01" bind:value={mu}></Slider>
+    <div class="flex flex-col justify-start text-left">
+        <span>μ = {mu}</span>
+        <span>σ =  {sigma}</span>
+    </div>
 </div>
 
 <style>

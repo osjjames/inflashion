@@ -23,10 +23,10 @@ module.exports = {
                 }
             },
             gridTemplateColumns: {
-                'bc-controller': '4em 1fr',
+                'bc-controller': '1em 1fr',
             },
             gridTemplateRows: {
-                'bc-controller': '1fr 2em',
+                'bc-controller': '1fr 1em',
             }
         }
     },

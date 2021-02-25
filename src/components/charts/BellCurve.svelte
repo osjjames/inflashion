@@ -57,8 +57,8 @@
     }
 </script>
 
-<div class="h-full p-2">
-    <div class="h-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden">
+<div class="h-full w-full p-2">
+    <div class="h-full w-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden">
         {#if sigma === 0}
             <Chart x1={0} x2={xMaxZero} y1={0} y2={yMax}>
                 <Svg>

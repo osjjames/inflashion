@@ -20,7 +20,7 @@
        timer = new IntervalTimer({
            name: 'simulation',
            callback: simulation.nextDay,
-           interval: 500
+           interval: 100
        });
     });
 </script>
