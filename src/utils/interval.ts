@@ -6,9 +6,11 @@ type Props = {
     maxFires?: number
 }
 
-export default class IntervalTimer{
+export type IntervalTimerState = 'IDLE' | 'RUNNING' | 'PAUSED' | 'RESUMED';
+
+export class IntervalTimer{
     private remaining: number;
-    public state:  'IDLE' | 'RUNNING' | 'PAUSED' | 'RESUMED';
+    public state: IntervalTimerState;
     private name: string;
     private interval: number;
     private callback: Function;
@@ -22,7 +24,7 @@ export default class IntervalTimer{
 
     constructor(props: Props){
         this.remaining = 0;
-        this.state = 'IDLE'; //  0 = idle, 1 = running, 2 = paused, 3= resumed
+        this.state = 'IDLE';
 
         this.name = props.name;
         this.interval = props.interval; //in ms

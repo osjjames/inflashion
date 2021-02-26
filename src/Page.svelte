@@ -22,7 +22,7 @@
             <BellCurveController bind:mu={$parameters.stakeCompletion.mu} bind:sigma={$parameters.stakeCompletion.sigma}/>
         </div>
         <div class="w-1/2 flex items-end flex-col">
-            <Slider inputClass="w-72" min="0" max={maxPopulation} step="1" bind:value={population}></Slider>
+<!--            <Slider inputClass="w-72" min="0" max={maxPopulation} step="1" bind:value={population}></Slider>-->
             <AgentGrid {population} {maxPopulation} agents={sim.agents}/>
         </div>
     </div>

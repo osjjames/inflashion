@@ -27,7 +27,7 @@
 
 <div class:vertical class:gaussian>
     <input id="{id}" type="range" {min} {max} {step} bind:value
-        class={`rounded h-2 border-0 bg-flash-gray-300 focus:outline-none ${inputClass}`}
+        class="rounded-full h-1 border-0 bg-flash-gray-300 focus:outline-none {inputClass}"
     />
 </div>
 
@@ -37,8 +37,7 @@
 
         &::-webkit-slider-thumb {
              -webkit-appearance: none;
-             @apply w-4 h-4 bg-gradient-to-r from-flash-pink to-flash-blue cursor-pointer rounded-full;
-             background: linear-gradient(90deg, #e62b96, #e3339e, #d946b3, #c45ecf, #a178e9, #6e8ff9, #1fa1fd, #00aff6, #00b9ea, #00c0de, #0cc4d5, #24c5d2);
+             @apply w-4 h-4 bg-flash-gray-100 cursor-pointer rounded-full;
          }
     }
 

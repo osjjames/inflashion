@@ -9,7 +9,7 @@
 
     export let population: number;
     export let maxPopulation: number;
-    export let agents: Array<Agent>;
+    export let agents: Agent[] = [];
     const peoplePerRow = 10;
 
     $: agentDisplayStore = $agentDisplay;

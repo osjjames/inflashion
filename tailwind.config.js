@@ -8,6 +8,9 @@ module.exports = {
         fontFamily: {
             sans: ['Montserrat', ...defaultTheme.fontFamily.sans]
         },
+        boxShadow: {
+            'flash-blue': '0px 0px 15px -2px rgba(36,197,210,0.7)'
+        },
         extend: {
             colors: {
                 'flash-pink': '#E62B96',
@@ -27,6 +30,10 @@ module.exports = {
             },
             gridTemplateRows: {
                 'bc-controller': '1fr 1em',
+            },
+            backgroundImage: {
+                // 'flash-gradient': "linear-gradient(60deg, #e62b96, #d847b4, #c45ecf, #aa72e4, #8a83f2, #6492fb, #329efe, #00a9fb, #00b2f4, #00b9ea, #00c0de, #24c5d2)"
+                'flash-gradient': "linear-gradient(60deg, #e62b96 0%, #62a3f9 65%, #24c5d2 100%)"
             }
         }
     },
