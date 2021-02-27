@@ -1,9 +1,12 @@
 <script lang="ts">
     import BellCurve from "./BellCurve.svelte";
     import Slider from "../input/Slider.svelte";
+    import pdf from 'distributions-truncated-normal-pdf';
 
     export let mu: number = 0.5;
     export let sigma: number = 0.05;
+    export let gaussianPoints = 0;
+    export let message: string = '';
     let widthClass: string = '64';
     let heightClass: string = '32';
 </script>
@@ -19,7 +22,8 @@
     </div>
     <div class="flex flex-col justify-start text-left">
         <span>μ = {mu}</span>
-        <span>σ =  {sigma}</span>
+        <span>σ = {sigma}</span>
+        <span>{message}</span>
     </div>
 </div>
 

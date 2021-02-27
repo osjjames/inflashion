@@ -9,6 +9,28 @@ export type SimulationParameters = {
     stakeDuration: TruncatedNormalDistribution, // Average duration of stake
     stakeCompletion: TruncatedNormalDistribution // Average percentage of stake duration completed before unstaking
 }
+// type ParameterProps = {
+//     name: string,
+//     distribution: TruncatedNormalDistribution
+// }
+// export class Parameter {
+//     private _name: string;
+//     private _distribution: TruncatedNormalDistribution;
+//     public getMessage: (range: number) => string;
+//
+//     get name() {return this._name}
+//     get distribution() {return this._distribution}
+//
+//     constructor(props: ParameterProps) {
+//         this._name = props.name;
+//         this._distribution = props.distribution;
+//         this.getMessage = (range) => {
+//             switch (this._distribution.sigma) {
+//                 case 0: return 'All agents will '
+//             }
+//         }
+//     }
+// }
 
 type SimulationProps = {
     totalSupply: number,

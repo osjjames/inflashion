@@ -4,7 +4,7 @@
     export let height: number = 32;
 </script>
 
-<button on:click={onClick} class="flash-button bg-flash-gradient rounded-2xl w-{width} h-{height} font-semibold text-2xl border-0 shadow-flash-blue">
+<button on:click={onClick} class="flash-button bg-flash-gradient rounded-2xl w-{width} h-{height} font-semibold text-2xl border-0 shadow-flash-blue focus:outline-none">
     <slot></slot>
 </button>
 
