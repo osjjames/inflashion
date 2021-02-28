@@ -1,10 +1,12 @@
 import gaussian from "gaussian";
 
+export type Bounds = {
+    lower: number,
+    upper: number
+}
+
 export type TruncatedNormalDistribution = {
-    bounds: {
-        upper: number,
-        lower: number
-    },
+    bounds: Bounds,
     mu: number,
     sigma: number
 }
