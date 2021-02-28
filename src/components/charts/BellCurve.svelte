@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Chart, Box, Grid, Svg, SvgLine} from '@sveltejs/pancake';
+    import {Chart, Box, Grid, Svg, SvgLine, Quadtree} from '@sveltejs/pancake';
     import gaussian from 'gaussian';
     import SvgSmoothLine from "./pancakeExtensions/SvgSmoothLine.svelte";
     import pdf from 'distributions-truncated-normal-pdf';
@@ -8,11 +8,15 @@
     const xMax = 100;
     const yMax = 1;
 
-    const xMaxZero = 1000;
-
     export let mu: number = 0.5;
     export let sigma: number = 0.05;
     let gaussianPoints = [];
+    let xValues = [];
+    let zeroPoints = [];
+    let closest = undefined;
+    let editing: boolean = true;
+
+    const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
     const chartPointsFromSamples = (mu: number, sigma: number, samples: number = 1000): Array<{x: number, y: number}> => {
         const data = [];
@@ -32,7 +36,6 @@
 
     const chartPointsFromPdf = (mu: number, sigma: number): Array<{x: number, y: number}> => {
         const options = {a: 0, b: 1, mu, sigma};
-        const xValues = Array.from(Array(xMax + 1).keys()).map(n => n/xMax);
         const gaussianValues: Number[] = pdf(xValues, options);
         const probMax: Number = pdf(mu, options);
         return gaussianValues.map((value, i) => ({
@@ -41,41 +44,55 @@
         }));
     }
 
-    const chartPointsZero = (mu: number): Array<{x: number, y: number}> => {
-        const xValues = Array.from(Array(xMaxZero + 1).keys()).map(n => n/xMaxZero);
-        // Get x value that is closest to mu
-        const closest = xValues.reduce((prev, curr) => Math.abs(curr - mu) < Math.abs(prev - mu) ? curr : prev);
-        const gaussianValues = xValues.map(x => x === closest ? 1 : 0);
-        return gaussianValues.map((value, i) => ({
-            x: i,
-            y: value * yMax
-        }));
+    const mirrorMu = (x: number): number => {
+        const scaledX = x/xMax;
+        const diff = mu - scaledX;
+        return clamp(Math.round((mu + diff)*xMax), 0, xMax)
     }
 
-    $: {
-        gaussianPoints = sigma === 0 ? chartPointsZero(mu) : chartPointsFromPdf(mu, sigma);
-    }
+    const verticalLine = (x: number): Array<{x: number, y: number}> => [{x, y: 0}, {x, y: yMax}];
+
+    const verticalLineAtMu = (mu: number): Array<{x: number, y: number}> => verticalLine(Math.round(mu*xMax));
+
+    $: xValues = Array.from(Array(xMax + 1).keys()).map(n => n/xMax);
+    $: zeroPoints = xValues.map(n => ({x: n*xMax, y: 0}));
+    $: gaussianPoints = sigma === 0 ? verticalLineAtMu(mu) : chartPointsFromPdf(mu, sigma);
 </script>
 
 <div class="h-full w-full p-2">
-    <div class="h-full w-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden">
-        {#if sigma === 0}
-            <Chart x1={0} x2={xMaxZero} y1={0} y2={yMax}>
+    <div class="h-full w-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden"  on:click={() => editing = !editing}>
+        <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
+            {#if sigma === 0}
                 <Svg>
                     <SvgLine data={gaussianPoints} let:d>
                         <path class="data" {d}/>
                     </SvgLine>
+                    <SvgLine data={[{x: 0, y: 0}, {x: xMax, y: 0}]} let:d>
+                        <path class="data" {d}/>
+                    </SvgLine>
                 </Svg>
-            </Chart>
-        {:else}
-            <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
+            {:else}
                 <Svg>
+                    {#if closest}
+                        <SvgLine data={verticalLineAtMu(mu)} let:d>
+                            <path class="data mu" {d} stroke-dasharray="2,12"/>
+                        </SvgLine>
+                        <SvgLine data={verticalLine(closest.x)} let:d>
+                            <path class="data bound" {d} stroke-dasharray="2,8"/>
+                        </SvgLine>
+                        <SvgLine data={verticalLine(mirrorMu(closest.x))} let:d>
+                            <path class="data bound lower" {d} stroke-dasharray="2,8"/>
+                        </SvgLine>
+                    {/if}
                     <SvgSmoothLine data={gaussianPoints} let:d>
                         <path class="data" {d}/>
                     </SvgSmoothLine>
                 </Svg>
-            </Chart>
-        {/if}
+                {#if editing}
+                    <Quadtree data={zeroPoints} bind:closest/>
+                {/if}
+            {/if}
+        </Chart>
     </div>
 </div>
 
@@ -116,5 +133,17 @@
         stroke-linecap: round;
         stroke-width: 4px;
         fill: none;
+
+        &.mu {
+            stroke-width: 2px;
+            stroke-linecap: butt;
+        }
+
+        &.bound {
+            @apply text-flash-blue;
+            opacity: 0.6;
+            stroke-width: 2px;
+            stroke-linecap: butt;
+        }
     }
 </style>
