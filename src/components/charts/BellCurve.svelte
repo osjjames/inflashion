@@ -84,17 +84,19 @@
 <div class="h-full w-full p-2">
     <div class="h-full w-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden"  class:locked on:click={toggleLocked}>
         <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
+            <Svg>
             {#if sigma === 0}
-                <Svg>
                     <SvgLine data={gaussianPoints} let:d>
                         <path class="data" {d}/>
                     </SvgLine>
                     <SvgLine data={[{x: 0, y: 0}, {x: xMax, y: 0}]} let:d>
                         <path class="data" {d}/>
                     </SvgLine>
-                </Svg>
+            {:else if sigma === Infinity}
+                    <SvgLine data={[{x: 0, y: yMax}, {x: xMax, y: yMax}]} let:d>
+                        <path class="data" {d}/>
+                    </SvgLine>
             {:else}
-                <Svg>
                     {#if closest}
                         <SvgLine data={verticalLine(mu)} let:d>
                             <path class="data mu" {d} stroke-dasharray="2,12"/>
@@ -109,8 +111,8 @@
                     <SvgSmoothLine data={gaussianPoints} let:d>
                         <path class="data" {d}/>
                     </SvgSmoothLine>
-                </Svg>
             {/if}
+            </Svg>
             {#if !locked}
                 <Quadtree data={zeroPoints} bind:closest/>
             {/if}

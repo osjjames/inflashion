@@ -1,34 +1,38 @@
 <script lang="ts">
     export let min: number;
     export let max: number;
-    export let step: number;
+    export let stepCount: number;
     export let value: number;
-    export let log: boolean = false;
-    export let inputClass: string;
-    export let id: string = 'slider';
+    export let inputClass: string = '';
     export let vertical: boolean = false;
     export let gaussian: boolean = false;
 
-    // const logslider(value) {
-    //     // position will be between 0 and 100
-    //     var minp = min;
-    //     var maxp = max;
-    //
-    //     // The result should be between 100 an 10000000
-    //     var minv = Math.log(100);
-    //     var maxv = Math.log(10000000);
-    //
-    //     // calculate adjustment factor
-    //     var scale = (maxv-minv) / (maxp-minp);
-    //
-    //     return Math.exp(minv + scale*(position-minp));
-    // }
+    let linValue: number = value;
+    $: log = max === Infinity;
+    $: if (log) {
+        value = linToLog(linValue);
+    }
+
+    const linToLog = (value: number): number => {
+        if (value === min) return min;
+        if (value === min + 1) return Infinity;
+        // Squish factor, the smaller it is the more the slider caters to small values
+        let squish = 0.5;
+        // Transformed log function with f(min) = 0, f(min+1) = Infinity
+        return Math.log(1 - (value - min)) * (-1) * squish;
+    }
 </script>
 
 <div class:vertical class:gaussian>
-    <input id="{id}" type="range" {min} {max} {step} bind:value
-        class="rounded-full h-1 border-0 bg-flash-gray-300 focus:outline-none {inputClass}"
-    />
+    {#if log}
+        <input type="range" {min} max={min+1} step={1/stepCount} bind:value={linValue}
+            class="rounded-full h-1 border-0 bg-flash-gray-300 focus:outline-none {inputClass}"
+        />
+    {:else}
+        <input type="range" {min} {max} step={(max-min)/stepCount} bind:value={value}
+               class="rounded-full h-1 border-0 bg-flash-gray-300 focus:outline-none {inputClass}"
+        />
+    {/if}
 </div>
 
 <style>

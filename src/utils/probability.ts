@@ -17,6 +17,7 @@ export const randomTrunc = (dist: TruncatedNormalDistribution): number => {
     if (dist.bounds.lower > dist.mu || dist.bounds.upper < dist.mu) throw new Error('Mu must be on or within the bounds');
 
     if (dist.sigma === 0) return dist.mu;
+    if (dist.sigma === Infinity) return (Math.random() * (dist.bounds.upper - dist.bounds.lower)) + dist.bounds.lower;
 
     // Box-Muller transform
     function randomNormals() {
