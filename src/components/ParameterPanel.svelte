@@ -63,5 +63,5 @@
 </script>
 
 {#each Object.keys($parameters) as parameter}
-    <BellCurveController bind:mu={$parameters[parameter].mu} bind:sigma={$parameters[parameter].sigma} message={probabilityMessages[parameter]}/>
+    <BellCurveController bind:mu={$parameters[parameter].mu} bind:sigma={$parameters[parameter].sigma}/>
 {/each}

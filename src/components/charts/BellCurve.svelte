@@ -1,19 +1,18 @@
 <script lang="ts">
-    import {Chart, Box, Grid, Svg, SvgLine, Quadtree} from '@sveltejs/pancake';
-    import gaussian from 'gaussian';
+    import {Chart, Svg, SvgLine, Quadtree} from '@sveltejs/pancake';
     import SvgSmoothLine from "./pancakeExtensions/SvgSmoothLine.svelte";
     import pdf from 'distributions-truncated-normal-pdf';
-    import {randomTrunc} from "../../utils/probability";
+    import {randomTrunc, truncatedPdf} from "../../utils/probability";
     import type {Bounds} from "../../utils/probability";
-    import {scale} from "svelte/transition";
 
     const xMax = 100;
     const yMax = 1;
 
-    export let mu: number = 0.5;
-    export let sigma: number = 0.05;
-    export let bounds: Bounds;
-    let gaussianPoints = [];
+    export let mu: number = 0;
+    export let sigma: number = 0;
+    export let bounds: Bounds | null;
+    export let cdf: (x: number) => number;
+    let gaussianPoints: {x: number, y: number}[] = [];
     let xValues = [];
     let zeroPoints = [];
     let closest = undefined;
@@ -53,6 +52,16 @@
         }));
     }
 
+    const chartPointsFromMyPdf = (mu: number, sigma: number): Array<{x: number, y: number}> => {
+        const pdf = truncatedPdf({mu, sigma, bounds: {lower: 0, upper: 1}});
+        const gaussianValues = xValues.map(x => pdf(x));
+        const probMax: Number = pdf(mu);
+        return gaussianValues.map((value, i) => ({
+            x: i,
+            y: value * (yMax / probMax)
+        }));
+    }
+
     const verticalLine = (x: number): Array<{x: number, y: number}> => {
         const scaledX = Math.round(x*xMax);
         return [{x: scaledX, y: 0}, {x: scaledX, y: yMax}];
@@ -62,7 +71,15 @@
     $: zeroPoints = xValues.map(n => ({x: n*xMax, y: 0}));
     $: gaussianPoints = sigma === 0 ? verticalLine(mu) : chartPointsFromPdf(mu, sigma);
     $: range = closest && !locked ? Math.abs(closest.x/xMax - mu) : range;
-    $: bounds = {lower: clamp(mu - range, 0, 1), upper: clamp(mu + range, 0, 1)};
+    $: bounds = closest ? {lower: clamp(mu - range, 0, 1), upper: clamp(mu + range, 0, 1)} : null;
+    $: {
+        let barAreas = gaussianPoints.map(point => point.x * point.y);
+        let cumulativeAreas = [];
+        for (let i = 0; i < barAreas.length; i++) {
+            cumulativeAreas.push(i === 0 ? barAreas[0] : cumulativeAreas[i-1] + barAreas[i]);
+        }
+        cdf = (x: number) => cumulativeAreas[Math.round(x*xMax)] / cumulativeAreas[cumulativeAreas.length - 1];
+    }
 </script>
 
 <div class="h-full w-full p-2">

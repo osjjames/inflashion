@@ -61,10 +61,23 @@ export const truncatedSigma = (dist: TruncatedNormalDistribution): number => {
     );
 }
 
+// From PDF definition at https://www.wikiwand.com/en/Truncated_normal_distribution
+export const truncatedPdf = (dist: TruncatedNormalDistribution): ((x: number) => number) => {
+    if (dist.sigma === 0) return ((x: number) => x === dist.mu ? 1 : 0);
+    const g = gaussian(dist.mu, Math.sqrt(dist.sigma));
+    const alpha = (dist.bounds.lower - dist.mu) / dist.sigma;
+    const beta  = (dist.bounds.upper - dist.mu) / dist.sigma;
+    const Z = g.cdf(beta) - g.cdf(alpha);
+    return (x: number) => {
+        const xi = (x - dist.mu) / dist.sigma;
+        return g.pdf(xi) / (dist.sigma*Z);
+    }
+}
+
 // From CDF definition at https://www.wikiwand.com/en/Truncated_normal_distribution
 export const truncatedCdf = (dist: TruncatedNormalDistribution): ((x: number) => number) => {
     if (dist.sigma === 0) return ((x: number) => x >= dist.mu ? 1 : 0);
-    const g = gaussian(dist.mu, dist.sigma);
+    const g = gaussian(dist.mu, Math.sqrt(dist.sigma));
     const alpha = (dist.bounds.lower - dist.mu) / dist.sigma;
     const beta  = (dist.bounds.upper - dist.mu) / dist.sigma;
     const Z = g.cdf(beta) - g.cdf(alpha);
