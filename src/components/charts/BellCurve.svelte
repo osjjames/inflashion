@@ -2,8 +2,9 @@
     import {Chart, Svg, SvgLine, Quadtree} from '@sveltejs/pancake';
     import SvgSmoothLine from "./pancakeExtensions/SvgSmoothLine.svelte";
     import pdf from 'distributions-truncated-normal-pdf';
-    import {randomTrunc, truncatedPdf} from "../../utils/probability";
+    import {randomTrunc} from "../../utils/probability";
     import type {Bounds} from "../../utils/probability";
+    import {scale} from "svelte/transition";
 
     const xMax = 100;
     const yMax = 1;
@@ -52,16 +53,6 @@
         }));
     }
 
-    const chartPointsFromMyPdf = (mu: number, sigma: number): Array<{x: number, y: number}> => {
-        const pdf = truncatedPdf({mu, sigma, bounds: {lower: 0, upper: 1}});
-        const gaussianValues = xValues.map(x => pdf(x));
-        const probMax: Number = pdf(mu);
-        return gaussianValues.map((value, i) => ({
-            x: i,
-            y: value * (yMax / probMax)
-        }));
-    }
-
     const verticalLine = (x: number): Array<{x: number, y: number}> => {
         const scaledX = Math.round(x*xMax);
         return [{x: scaledX, y: 0}, {x: scaledX, y: yMax}];
@@ -70,15 +61,23 @@
     $: xValues = Array.from(Array(xMax + 1).keys()).map(n => n/xMax);
     $: zeroPoints = xValues.map(n => ({x: n*xMax, y: 0}));
     $: gaussianPoints = sigma === 0 ? verticalLine(mu) : chartPointsFromPdf(mu, sigma);
-    $: range = closest && !locked ? Math.abs(closest.x/xMax - mu) : range;
+    $: range = closest && !locked
+        ? Math.abs(closest.x/xMax - mu) || range
+        : range;
     $: bounds = closest ? {lower: clamp(mu - range, 0, 1), upper: clamp(mu + range, 0, 1)} : null;
     $: {
-        let barAreas = gaussianPoints.map(point => point.x * point.y);
+        let barAreas = gaussianPoints.map(point => point.y / (xMax+1));
         let cumulativeAreas = [];
         for (let i = 0; i < barAreas.length; i++) {
-            cumulativeAreas.push(i === 0 ? barAreas[0] : cumulativeAreas[i-1] + barAreas[i]);
+            cumulativeAreas.push(i === 0 ? 0 : cumulativeAreas[i-1] + barAreas[i-1]);
         }
-        cdf = (x: number) => cumulativeAreas[Math.round(x*xMax)] / cumulativeAreas[cumulativeAreas.length - 1];
+
+        cdf = (x: number) => {
+            const scaledX = Math.round(x*xMax);
+            return scaledX >= cumulativeAreas.length
+                ? 1
+                : cumulativeAreas[scaledX] / cumulativeAreas[cumulativeAreas.length - 1];
+        }
     }
 </script>
 
@@ -111,9 +110,9 @@
                         <path class="data" {d}/>
                     </SvgSmoothLine>
                 </Svg>
-                {#if !locked}
-                    <Quadtree data={zeroPoints} bind:closest/>
-                {/if}
+            {/if}
+            {#if !locked}
+                <Quadtree data={zeroPoints} bind:closest/>
             {/if}
         </Chart>
     </div>
