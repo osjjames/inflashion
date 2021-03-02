@@ -17,18 +17,16 @@ type ParameterProps = {
 }
 export type MessageGenerator = (mu: number, sigma: number, bounds: Bounds, area: number) => string;
 export class Parameter {
-    private _name: string;
+    readonly name: string;
     private _distribution: TruncatedNormalDistribution;
-    private _messageGenerator: MessageGenerator
+    readonly messageGenerator: MessageGenerator;
 
-    get name() {return this._name}
     get distribution() {return this._distribution}
-    get messageGenerator() {return this._messageGenerator}
 
     constructor(props: ParameterProps) {
-        this._name = props.name;
+        this.name = props.name;
         this._distribution = props.distribution;
-        this._messageGenerator = props.messageGenerator;
+        this.messageGenerator = props.messageGenerator;
     }
 }
 
@@ -53,7 +51,6 @@ export class Simulation {
     get today() {return this._today}
 
     public beginDay = (): Simulation => {
-        console.log(this);
         for (let agent of this._agents) {
             const actions = agent.dailyCheck(this._today, this);
             for (let action of actions) {

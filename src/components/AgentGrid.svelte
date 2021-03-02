@@ -4,17 +4,11 @@
     import { scale, fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import type {Agent} from "../utils/agent";
-    import {agentDisplay} from "../store/agentDisplay";
-    import {simulation} from "../store/simulation";
 
     export let population: number;
     export let maxPopulation: number;
     export let agents: Agent[] = [];
     const peoplePerRow = 10;
-
-    $: agentDisplayStore = $agentDisplay;
-    $: sim = $simulation;
-    $: selectedAgent = sim.agents.find(a => a.name === agentDisplayStore.selectedAgentName);
 
     $: population = agents.length;
     $: numberOfRows = Math.ceil(population / peoplePerRow);
@@ -30,7 +24,4 @@
     {#each Array(peoplePerRow-remainder) as _,k}
         <div></div>
     {/each}
-</div>
-<div>
-    <pre>{JSON.stringify(selectedAgent)}</pre>
 </div>

@@ -23,17 +23,4 @@
 			@apply p-0;
 		}
 	}
-
-	main {
-		text-align: center;
-		max-width: 240px;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
 </style>

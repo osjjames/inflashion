@@ -4,5 +4,9 @@
 </script>
 
 {#each Object.keys($parameters) as parameter}
-    <BellCurveController bind:mu={$parameters[parameter].distribution.mu} bind:sigma={$parameters[parameter].distribution.sigma} getMessage={$parameters[parameter].messageGenerator}/>
+    <BellCurveController
+        bind:mu={$parameters[parameter].distribution.mu}
+        bind:sigma={$parameters[parameter].distribution.sigma}
+        getMessage={$parameters[parameter].messageGenerator}
+    />
 {/each}
