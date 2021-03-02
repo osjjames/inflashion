@@ -67,12 +67,12 @@ export class Agent {
 
         if (this._activeStake === null) {
             const stake = new Stake({
-                amount: Math.round(randomTrunc(currentParameters.stakeProportion) * this._holdings),
-                duration: Math.ceil(randomTrunc(currentParameters.stakeDuration) * simulation.protocol.maxStakeDuration),
+                amount: Math.round(randomTrunc(currentParameters.stakeProportion.distribution) * this._holdings),
+                duration: Math.ceil(randomTrunc(currentParameters.stakeDuration.distribution) * simulation.protocol.maxStakeDuration),
                 startDay: today,
                 fpy: simulation.protocol.fpy
             });
-            const queuedUnstakeDay = today + Math.ceil(randomTrunc(currentParameters.stakeCompletion) * stake.duration);
+            const queuedUnstakeDay = today + Math.ceil(randomTrunc(currentParameters.stakeCompletion.distribution) * stake.duration);
 
             if (stake.duration > 0 && queuedUnstakeDay > today) {
                 if (stake.amount > 0) {

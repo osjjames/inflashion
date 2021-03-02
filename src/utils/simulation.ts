@@ -3,34 +3,34 @@ import type {TruncatedNormalDistribution} from "./probability";
 import type {Day} from "./protocol";
 import {Protocol} from "./protocol";
 import {initialiseAgents} from "./agent";
+import type {Bounds} from "./probability";
 
 export type SimulationParameters = {
-    stakeProportion: TruncatedNormalDistribution, // Average percentage of net worth staked
-    stakeDuration: TruncatedNormalDistribution, // Average duration of stake
-    stakeCompletion: TruncatedNormalDistribution // Average percentage of stake duration completed before unstaking
+    stakeProportion: Parameter, // Average percentage of net worth staked
+    stakeDuration: Parameter, // Average duration of stake
+    stakeCompletion: Parameter // Average percentage of stake duration completed before unstaking
 }
-// type ParameterProps = {
-//     name: string,
-//     distribution: TruncatedNormalDistribution
-// }
-// export class Parameter {
-//     private _name: string;
-//     private _distribution: TruncatedNormalDistribution;
-//     public getMessage: (range: number) => string;
-//
-//     get name() {return this._name}
-//     get distribution() {return this._distribution}
-//
-//     constructor(props: ParameterProps) {
-//         this._name = props.name;
-//         this._distribution = props.distribution;
-//         this.getMessage = (range) => {
-//             switch (this._distribution.sigma) {
-//                 case 0: return 'All agents will '
-//             }
-//         }
-//     }
-// }
+type ParameterProps = {
+    name: string,
+    distribution: TruncatedNormalDistribution,
+    messageGenerator: MessageGenerator
+}
+export type MessageGenerator = (mu: number, sigma: number, bounds: Bounds, area: number) => string;
+export class Parameter {
+    private _name: string;
+    private _distribution: TruncatedNormalDistribution;
+    private _messageGenerator: MessageGenerator
+
+    get name() {return this._name}
+    get distribution() {return this._distribution}
+    get messageGenerator() {return this._messageGenerator}
+
+    constructor(props: ParameterProps) {
+        this._name = props.name;
+        this._distribution = props.distribution;
+        this._messageGenerator = props.messageGenerator;
+    }
+}
 
 type SimulationProps = {
     totalSupply: number,

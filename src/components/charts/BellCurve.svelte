@@ -6,7 +6,7 @@
     import type {Bounds} from "../../utils/probability";
     import {scale} from "svelte/transition";
 
-    const xMax = 100;
+    const xMax = 200;
     const yMax = 1;
 
     export let mu: number = 0;
@@ -66,17 +66,24 @@
         : range;
     $: bounds = closest ? {lower: clamp(mu - range, 0, 1), upper: clamp(mu + range, 0, 1)} : null;
     $: {
-        let barAreas = gaussianPoints.map(point => point.y / (xMax+1));
-        let cumulativeAreas = [];
-        for (let i = 0; i < barAreas.length; i++) {
-            cumulativeAreas.push(i === 0 ? 0 : cumulativeAreas[i-1] + barAreas[i-1]);
-        }
+        if (sigma === 0) {
+            cdf = (x: number) => x >= mu ? 1 : 0;
+        } else if (sigma === Infinity) {
+            cdf = (x: number) => x;
+        } else {
+            let barAreas = gaussianPoints.map(point => point.y / (xMax + 1));
+            let cumulativeAreas = [];
+            for (let i = 0; i < barAreas.length; i++) {
+                cumulativeAreas.push(i === 0 ? 0 : cumulativeAreas[i - 1] + barAreas[i - 1]);
+            }
 
-        cdf = (x: number) => {
-            const scaledX = Math.round(x*xMax);
-            return scaledX >= cumulativeAreas.length
-                ? 1
-                : cumulativeAreas[scaledX] / cumulativeAreas[cumulativeAreas.length - 1];
+            // Need to wait for cdf to be updated before it gets used
+            cdf = (x: number) => {
+                const scaledX = Math.round(x * xMax);
+                return scaledX >= cumulativeAreas.length
+                    ? 1
+                    : cumulativeAreas[scaledX] / cumulativeAreas[cumulativeAreas.length - 1];
+            }
         }
     }
 </script>

@@ -4,10 +4,11 @@
     import pdf from 'distributions-truncated-normal-pdf';
     import type {Bounds, TruncatedNormalDistribution} from "../../utils/probability";
     import {parameters} from "../../store/simulation";
+    import type {MessageGenerator} from "../../utils/simulation";
 
     export let mu: number = 0;
     export let sigma: number = 0;
-    export let gaussianPoints = 0;
+    export let getMessage: MessageGenerator;
     let bounds: Bounds | null = null;
     let cdf: (x: number) => number;
     let widthClass: string = '64';
@@ -17,16 +18,12 @@
         return cdf(bounds.upper) - cdf(bounds.lower);
     }
 
-    const getMessage = (mu: number, sigma: number, bounds: Bounds) => {
+    const getMessageSafe = (mu: number, sigma: number, bounds: Bounds) => {
         if (!bounds) return '';
-        switch (sigma) {
-            case 0: return `All agents will stake for ${(mu*100).toFixed(0)}% of the maximum stake duration`;
-            case Infinity: return 'All agents will stake for a totally random duration.';
-            default: return `${(getAreaUnderCurve(cdf, bounds)*100).toFixed(1)}% of agents will stake for ${(bounds.lower*100).toFixed(0)}-${(bounds.upper*100).toFixed(0)}% of the maximum stake duration`
-        }
+        return getMessage(mu, sigma, bounds, getAreaUnderCurve(cdf, bounds));
     }
 
-    $: message = getMessage(mu, sigma, bounds);
+    $: message = getMessageSafe(mu, sigma, bounds);
 </script>
 
 <div class="flex">
