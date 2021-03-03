@@ -46,3 +46,13 @@ export const randomTrunc = (dist: TruncatedNormalDistribution): number => {
     return random(dist.mu, dist.sigma);
 }
 
+type RoundType = 'FLOOR' | 'CEIL' | 'ROUND';
+// Rounds a random sample to a given factor
+export const probRound = (number: number, factor: number, type: RoundType = 'ROUND') => {
+    switch(type) {
+        case "FLOOR": return Math.floor(number * factor) / factor;
+        case "CEIL": return Math.ceil(number * factor) / factor;
+        case "ROUND": return Math.round(number * factor) / factor;
+    }
+}
+

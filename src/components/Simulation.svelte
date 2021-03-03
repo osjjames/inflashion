@@ -4,6 +4,7 @@
     import {IntervalTimer} from "../utils/interval";
     import type {IntervalTimerState} from "../utils/interval";
     import Button from "./input/Button.svelte";
+    import SimulationChart from "./SimulationChart.svelte";
 
     $: sim = $simulation;
 
@@ -30,11 +31,13 @@
     }
 
     const getButtonText = (state: IntervalTimerState) => {
-        console.log(state);
-        switch(state) {
-            case 'IDLE': return 'Start';
-            case 'PAUSED': return 'Resume';
-            default: return 'Pause';
+        switch (state) {
+            case 'IDLE':
+                return 'Start';
+            case 'PAUSED':
+                return 'Resume';
+            default:
+                return 'Pause';
         }
     }
 
@@ -42,12 +45,12 @@
         timer = new IntervalTimer({
             name: 'simulation',
             callback: simulation.nextDay,
-            interval: 100
+            interval: 20
         });
     });
 </script>
 
-<div>
+<div class="w-full h-full">
     <span>Day: {sim.today}</span>
     <br/>
     <span>FPY: {(sim.protocol.fpy*100).toFixed(2)} %</span>
@@ -55,4 +58,5 @@
     <span>Total Supply: {sim.protocol.totalSupply.toFixed(0)}</span>
     <br/>
     <Button onClick={togglePause} width={48} height={16}>{buttonText}</Button>
+    <SimulationChart/>
 </div>

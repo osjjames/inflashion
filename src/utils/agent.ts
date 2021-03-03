@@ -1,6 +1,6 @@
 import type {Day} from "./protocol";
 import type {Simulation, SimulationParameters} from "./simulation";
-import {randomTrunc} from "./probability";
+import {probRound, randomTrunc} from "./probability";
 import {Stake, Unstake} from "./protocol";
 import {parameters} from "../store/simulation";
 import {get} from "svelte/store";
@@ -67,7 +67,7 @@ export class Agent {
 
         if (this._activeStake === null) {
             const stake = new Stake({
-                amount: Math.round(randomTrunc(currentParameters.stakeProportion.distribution) * this._holdings),
+                amount: probRound(randomTrunc(currentParameters.stakeProportion.distribution), 100) * this._holdings,
                 duration: Math.ceil(randomTrunc(currentParameters.stakeDuration.distribution) * simulation.protocol.maxStakeDuration),
                 startDay: today,
                 fpy: simulation.protocol.fpy
