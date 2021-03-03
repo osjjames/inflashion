@@ -7,19 +7,28 @@
     export let vertical: boolean = false;
     export let gaussian: boolean = false;
 
-    let linValue: number = value;
-    $: log = max === Infinity;
-    $: if (log) {
-        value = linToLog(linValue);
-    }
-
+    // Squish factor, the smaller it is the more the slider caters to small values
+    const squish = 0.5;
+    
     const linToLog = (value: number): number => {
         if (value === min) return min;
         if (value === min + 1) return Infinity;
-        // Squish factor, the smaller it is the more the slider caters to small values
-        let squish = 0.5;
+
         // Transformed log function with f(min) = 0, f(min+1) = Infinity
         return Math.log(1 - (value - min)) * (-1) * squish;
+    }
+
+    const logToLin = (value: number): number => {
+        if (value === min) return min;
+        if (value === Infinity) return min+1;
+        // Inverse of linToLog function with f(0) = min, f(Infinity) = min+1
+        return (min+1) - Math.exp((-1) * (value / squish));
+    }
+
+    let linValue: number = logToLin(value);
+    $: log = max === Infinity;
+    $: if (log) {
+        value = linToLog(linValue);
     }
 </script>
 

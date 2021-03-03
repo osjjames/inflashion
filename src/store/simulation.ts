@@ -36,8 +36,8 @@ export const parameters = createParameters({
         name: 'Stake Proportion',
         distribution: {
             bounds: {lower: 0, upper: 1},
-            mu: 1,
-            sigma: 0
+            mu: 0.5,
+            sigma: 0.1
         },
         messageGenerator: ((mu, sigma, bounds, area) => {
             switch (sigma) {
@@ -56,8 +56,8 @@ export const parameters = createParameters({
         name: 'Stake Duration',
         distribution: {
             bounds: {lower: 0, upper: 1},
-            mu: 1,
-            sigma: 0
+            mu: 0.5,
+            sigma: 0.1
         },
         messageGenerator: ((mu, sigma, bounds, area) => {
             switch (sigma) {
@@ -76,8 +76,8 @@ export const parameters = createParameters({
         name: 'Stake Completion',
         distribution: {
             bounds: {lower: 0, upper: 1},
-            mu: 1,
-            sigma: 0
+            mu: 0.5,
+            sigma: 0.1
         },
         messageGenerator: ((mu, sigma, bounds, area) => {
             switch (sigma) {

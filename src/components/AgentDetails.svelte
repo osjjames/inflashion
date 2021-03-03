@@ -7,6 +7,9 @@
     export let agent: Agent;
 
     $: sim = $simulation;
+    $: stakeProgress = agent.activeStake
+        ? (sim.today - agent.activeStake.startDay) / (agent.activeStake.endDay - agent.activeStake.startDay)
+        : 0
     const getProgress = (stake: Stake) => (sim.today - stake.startDay) / (stake.endDay - stake.startDay);
 </script>
 
@@ -17,6 +20,9 @@
     <br/>
     {#if agent.activeStake}
         <span>Staked: {agent.activeStake.amount}</span>
-        <span>Progress: {(getProgress(agent.activeStake)*100).toFixed(1)}%</span>
+        <br/>
+        <span>Progress: {(stakeProgress*100).toFixed(1)}%</span>
+        <br/>
+        <progress value={stakeProgress} max="1"></progress>
     {/if}
 </div>
