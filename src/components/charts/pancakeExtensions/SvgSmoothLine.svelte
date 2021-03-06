@@ -1,13 +1,16 @@
 
 
-<script>
+<script lang="ts">
     import { getChartContext } from '@sveltejs/pancake/components/Chart.svelte';
+    import type {Bounds} from "../../../utils/probability";
 
-    const default_x = d => d.x;
-    const default_y = d => d.y;
+    const default_x = (d, i = undefined) => d.x;
+    const default_y = (d, i = undefined) => d.y;
     const { x_scale, y_scale } = getChartContext();
 
     export let data;
+    export let bounds: Bounds | null;
+    export let xMax: number;
     export let x = default_x;
     export let y = default_y;
 
@@ -20,7 +23,7 @@
         }
     }
 
-    const controlPoint = (current, previous, next, reverse) => {
+    const controlPoint = (current, previous, next, reverse = false) => {
         // When 'current' is the first or last point of the array
         // 'previous' or 'next' don't exist.
         // Replace with 'current'
@@ -47,19 +50,30 @@
         return `C ${$x_scale(x(cps, i))},${$y_scale(y(cps, i))} ${$x_scale(x(cpe, i))},${$y_scale(y(cpe, i))} ${$x_scale(x(point, i))},${$y_scale(y(point, i))}`
     }
 
-
-    let d;
-    $: {
-        d = data.reduce((acc, point, i, a) => i === 0
-            // if first point
-            ? `M ${$x_scale(x(point, i))},${$y_scale(y(point, i))}`
-            // else
-            : `${acc} ${bezierCommand(point, i, a)}`
-            , '');
-        // d = 'M' + data
-        //     .map((d, i) => `${$x_scale(x(d, i))},${$y_scale(y(d, i))}`)
-        //     .join('L');
+    const truncatedData = (data, bounds) => {
+        const minSlice = bounds ? Math.floor(bounds.lower * (data.length)) : 0;
+        const maxSlice = bounds ? Math.ceil(bounds.upper * (data.length)): data.length;
+        return data.slice(minSlice, maxSlice);
     }
+
+    const dataToPath = data => data.reduce((acc, point, i, a) => i === 0
+        ? `M ${$x_scale(x(point, i))},${$y_scale(y(point, i))}`
+        : `${acc} ${bezierCommand(point, i, a)}`
+        , '');
+
+    const fill = (data) => {
+        // const maxY = Math.max(...data.map(d => d.y));
+        const minY = 0;
+        // const maxX = bounds ? (bounds.upper*xMax) : x(data[data.length-1]);
+        // const minX = bounds ? (bounds.lower*xMax) : x(data[0]);
+        const maxX = x(data[data.length-1]);
+        const minX = x(data[0]);
+        return `L ${$x_scale(maxX)},${$y_scale(minY)} L ${$x_scale(minX)},${$y_scale(minY)} Z`;
+    }
+
+    $: tData = truncatedData(data, bounds);
+    $: d = dataToPath(data);
+    $: dFill = `${dataToPath(tData)} ${fill(tData)}`;
 </script>
 
-<slot {d}></slot>
+<slot {d} {dFill}></slot>

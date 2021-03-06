@@ -25,15 +25,15 @@
     };
 </script>
 
-<div class={`w-${widthClass} h-${widthClass} opacity-50`} class:staking={agent.activeStake?.amount > 0} use:tippy={props} class:selected on:click={select}>
+<!--<div class={`w-${widthClass} h-${widthClass} opacity-50`} class:staking={agent.activeStake?.amount > 0} use:tippy={props} class:selected on:click={select}>-->
+<!--    <IoMdPerson/>-->
+<!--</div>-->
+<div class={`w-${widthClass} h-${widthClass}`} style="opacity: {selected ? 100 : Math.round((agent.activeStake?.amount / agent.holdings) * 90) + 10}%" use:tippy={props} class:selected on:click={select}>
     <IoMdPerson/>
 </div>
 
 <style>
     .selected {
-        @apply border-2 border-flash-gray-50 rounded-full overflow-hidden
-    }
-    .staking {
-        @apply opacity-100
+        @apply bg-flash-gray-300 rounded-full overflow-hidden
     }
 </style>

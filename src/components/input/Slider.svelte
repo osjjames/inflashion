@@ -35,11 +35,11 @@
 <div class:vertical class:gaussian>
     {#if log}
         <input type="range" {min} max={min+1} step={1/stepCount} bind:value={linValue}
-            class="rounded-full h-1 border-0 bg-flash-gray-300 focus:outline-none {inputClass}"
+            class="{inputClass}"
         />
     {:else}
         <input type="range" {min} {max} step={(max-min)/stepCount} bind:value={value}
-               class="rounded-full h-1 border-0 bg-flash-gray-300 focus:outline-none {inputClass}"
+               class="{inputClass}"
         />
     {/if}
 </div>
@@ -47,6 +47,7 @@
 <style>
     input[type=range] {
         -webkit-appearance: none;
+        @apply rounded-full h-2 border-0 bg-flash-gray-600 focus:outline-none;
 
         &::-webkit-slider-thumb {
              -webkit-appearance: none;
@@ -63,7 +64,8 @@
         height: 7rem;
         width: 0.5rem;
         padding: 0;
-        margin-bottom: 1rem;
+        margin-bottom: 0;
+        margin-right: 1rem;
 
         & input[type=range] {
             width: 7rem;

@@ -92,18 +92,29 @@
     <div class="h-full w-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden"  class:locked on:click={toggleLocked}>
         <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
             <Svg>
-            {#if sigma === 0}
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#E62B96;stop-opacity:70%" />
+                        <stop offset="100%" style="stop-color:#E62B96;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+                {#if sigma === 0}
                     <SvgLine data={gaussianPoints} let:d>
                         <path class="data" {d}/>
                     </SvgLine>
                     <SvgLine data={[{x: 0, y: 0}, {x: xMax, y: 0}]} let:d>
                         <path class="data" {d}/>
                     </SvgLine>
-            {:else if sigma === Infinity}
-                    <SvgLine data={[{x: 0, y: yMax}, {x: xMax, y: yMax}]} let:d>
+                {:else if sigma === Infinity}
+                    <SvgSmoothLine data={[{x: 0, y: yMax}, {x: xMax, y: yMax}]} let:d let:dFill>
+                        <path class="data-fill" d={dFill} fill="url(#grad1)"/>
                         <path class="data" {d}/>
-                    </SvgLine>
-            {:else}
+                    </SvgSmoothLine>
+                {:else}
+                    <SvgSmoothLine data={gaussianPoints} {bounds} {xMax} let:d let:dFill>
+                        <path class="data-fill" d={dFill} fill="url(#grad1)"/>
+                        <path class="data" {d}/>
+                    </SvgSmoothLine>
                     {#if closest}
                         <SvgLine data={verticalLine(mu)} let:d>
                             <path class="data mu" {d} stroke-dasharray="2,12"/>
@@ -115,10 +126,7 @@
                             <path class="data bound upper" {d}/>
                         </SvgLine>
                     {/if}
-                    <SvgSmoothLine data={gaussianPoints} let:d>
-                        <path class="data" {d}/>
-                    </SvgSmoothLine>
-            {/if}
+                {/if}
             </Svg>
             {#if !locked}
                 <Quadtree data={zeroPoints} bind:closest/>
@@ -176,14 +184,19 @@
 
         &.bound {
             &.lower {
-                @apply text-red-500;
+                @apply text-flash-pink;
             }
             &.upper {
-                @apply text-green-500;
+                @apply text-flash-pink;
             }
             opacity: 0.6;
             stroke-width: 2px;
             stroke-linecap: butt;
         }
+    }
+
+    path.data-fill {
+        stroke: none;
+        fill-opacity: 0.5;
     }
 </style>
