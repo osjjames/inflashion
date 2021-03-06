@@ -1,4 +1,6 @@
 <script lang="ts">
+    import FaLock from 'svelte-icons/fa/FaLock.svelte';
+    import FaUnlock from 'svelte-icons/fa/FaUnlock.svelte';
     import {Chart, Svg, SvgLine, Quadtree} from '@sveltejs/pancake';
     import SvgSmoothLine from "./pancakeExtensions/SvgSmoothLine.svelte";
     import pdf from 'distributions-truncated-normal-pdf';
@@ -88,51 +90,58 @@
     }
 </script>
 
-<div class="h-full w-full p-2">
-    <div class="h-full w-full border-2 border-b-0 border-flash-gray-600 rounded-t-2xl pb-0.5 pt-2 overflow-hidden"  class:locked on:click={toggleLocked}>
-        <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
-            <Svg>
-                <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#E62B96;stop-opacity:70%" />
-                        <stop offset="100%" style="stop-color:#E62B96;stop-opacity:0" />
-                    </linearGradient>
-                </defs>
-                {#if sigma === 0}
-                    <SvgLine data={gaussianPoints} let:d>
-                        <path class="data" {d}/>
+<div class="h-full w-full border-2 border-b-0 border-flash-gray-600 pb-0.5 pt-2 overflow-hidden cursor-crosshair relative" on:click={toggleLocked}>
+    <Chart x1={0} x2={xMax} y1={0} y2={yMax}>
+        <Svg>
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#E62B96;stop-opacity:70%" />
+                    <stop offset="100%" style="stop-color:#E62B96;stop-opacity:0" />
+                </linearGradient>
+            </defs>
+            {#if sigma === 0}
+                <SvgLine data={gaussianPoints} let:d>
+                    <path class="data" {d}/>
+                </SvgLine>
+                <SvgLine data={[{x: 0, y: 0}, {x: xMax, y: 0}]} let:d>
+                    <path class="data" {d}/>
+                </SvgLine>
+            {:else if sigma === Infinity}
+                <SvgSmoothLine data={[{x: 0, y: yMax}, {x: xMax, y: yMax}]} let:d let:dFill>
+                    <path class="data-fill" d={dFill} fill="url(#grad1)"/>
+                    <path class="data" {d}/>
+                </SvgSmoothLine>
+            {:else}
+                <SvgSmoothLine data={gaussianPoints} {bounds} {xMax} let:d let:dFill>
+                    <path class="data-fill" d={dFill} fill="url(#grad1)"/>
+                    <path class="data" {d}/>
+                </SvgSmoothLine>
+                {#if closest}
+                    <SvgLine data={verticalLine(mu)} let:d>
+                        <path class="data mu" {d} stroke-dasharray="0,12"/>
                     </SvgLine>
-                    <SvgLine data={[{x: 0, y: 0}, {x: xMax, y: 0}]} let:d>
-                        <path class="data" {d}/>
+                    <SvgLine data={verticalLine(bounds.lower)} let:d>
+                        <path class="data bound lower" {d} />
                     </SvgLine>
-                {:else if sigma === Infinity}
-                    <SvgSmoothLine data={[{x: 0, y: yMax}, {x: xMax, y: yMax}]} let:d let:dFill>
-                        <path class="data-fill" d={dFill} fill="url(#grad1)"/>
-                        <path class="data" {d}/>
-                    </SvgSmoothLine>
-                {:else}
-                    <SvgSmoothLine data={gaussianPoints} {bounds} {xMax} let:d let:dFill>
-                        <path class="data-fill" d={dFill} fill="url(#grad1)"/>
-                        <path class="data" {d}/>
-                    </SvgSmoothLine>
-                    {#if closest}
-                        <SvgLine data={verticalLine(mu)} let:d>
-                            <path class="data mu" {d} stroke-dasharray="2,12"/>
-                        </SvgLine>
-                        <SvgLine data={verticalLine(bounds.lower)} let:d>
-                            <path class="data bound lower" {d} />
-                        </SvgLine>
-                        <SvgLine data={verticalLine(bounds.upper)} let:d>
-                            <path class="data bound upper" {d}/>
-                        </SvgLine>
-                    {/if}
+                    <SvgLine data={verticalLine(bounds.upper)} let:d>
+                        <path class="data bound upper" {d}/>
+                    </SvgLine>
                 {/if}
-            </Svg>
-            {#if !locked}
-                <Quadtree data={zeroPoints} bind:closest/>
             {/if}
-        </Chart>
-    </div>
+        </Svg>
+        {#if !locked}
+            <Quadtree data={zeroPoints} bind:closest/>
+        {/if}
+    </Chart>
+    {#if closest}
+        <div class="absolute top-2 right-2 h-4 w-4 text-flash-gray-300 pointer-events-none" class:locked>
+            {#if locked}
+                <FaLock></FaLock>
+            {:else}
+                <FaUnlock></FaUnlock>
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -167,7 +176,7 @@
     }
 
     .locked {
-        @apply border-flash-gray-300;
+        @apply text-flash-gray-100;
     }
 
     path.data {
@@ -179,7 +188,6 @@
 
         &.mu {
             stroke-width: 2px;
-            stroke-linecap: butt;
         }
 
         &.bound {
@@ -191,7 +199,6 @@
             }
             opacity: 0.6;
             stroke-width: 2px;
-            stroke-linecap: butt;
         }
     }
 

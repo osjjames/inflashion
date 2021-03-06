@@ -27,17 +27,25 @@
 </script>
 
 <div class="flex">
-    <div class={` mb-8 grid grid-cols-bc-controller grid-rows-bc-controller gap-0 box-border`}>
+    <div class="mb-8 grid grid-cols-bc-controller grid-rows-bc-controller gap-0 box-border">
         <Slider inputClass={`sigma-slider w-24`} min="0" max={Infinity} stepCount="1000" bind:value={sigma} vertical gaussian></Slider>
-        <div class="h-{heightClass} w-{widthClass}">
-            <BellCurve mu={mu} {sigma} bind:bounds bind:cdf></BellCurve>
+        <div class="h-full w-full p-2">
+            <div class="w-full flex justify-evenly border-2 border-b-0 border-flash-gray-600 rounded-t-2xl">
+                <div class="w-1/2 pl-3">
+                    <span>μ = {mu}</span>
+                </div>
+                <div class="w-1/2 pl-3 border-l-2 border-flash-gray-600">
+                    <span>σ = {sigma === Infinity ? '∞' : sigma.toFixed(3)}</span>
+                </div>
+            </div>
+            <div class="h-{heightClass} w-{widthClass}">
+                <BellCurve mu={mu} {sigma} bind:bounds bind:cdf></BellCurve>
+            </div>
         </div>
         <div></div>
         <Slider inputClass={`mu-slider w-${widthClass}`} min="0" max="1" stepCount="100" bind:value={mu} gaussian></Slider>
     </div>
     <div class="flex flex-col justify-start text-left">
-        <span>μ = {mu}</span>
-        <span>σ = {sigma === Infinity ? '∞' : sigma.toFixed(3)}</span>
         <span>{message}</span>
     </div>
 </div>

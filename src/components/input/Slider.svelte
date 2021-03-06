@@ -64,8 +64,8 @@
         height: 7rem;
         width: 0.5rem;
         padding: 0;
-        margin-bottom: 0;
-        margin-right: 1rem;
+        margin-top: 1rem;
+        margin-right: 0rem;
 
         & input[type=range] {
             width: 7rem;
