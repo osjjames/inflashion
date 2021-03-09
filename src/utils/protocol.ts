@@ -38,7 +38,7 @@ export class Unstake {
     constructor(props: UnstakeProps) {
         this.stake = props.stake;
         this.day = props.day;
-        this.burned = ((props.stake.amount * (props.day - props.stake.startDay)) / props.stake.duration) * ((props.totalStaked - props.stake.amount) / props.totalSupply);
+        this.burned = props.stake.amount * ((props.stake.endDay - props.day) / props.stake.duration);
     }
 }
 
@@ -65,6 +65,8 @@ export class Protocol {
     get maxStakeDuration() {return this._maxStakeDuration}
 
     private registerStake = (stake: Stake) => {
+        console.log(this._totalStaked);
+        console.log(this._totalSupply);
         this._fpy = (1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2;
         this._maxStakeDuration = Math.floor((0.5 / this._fpy) * 365);
         this._totalSupply += stake.flashYield;
