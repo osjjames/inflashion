@@ -4,7 +4,11 @@
     import SvgSmoothLine from "./charts/pancakeExtensions/SvgSmoothLine.svelte";
     import type {Protocol} from "../utils/protocol";
 
-    const nf = new Intl.NumberFormat();
+    const numberWithSpaces = (x: number | string) => {
+        let parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        return parts.join(".");
+    }
     let supplyPoints: { x: number, y: number}[] = [];
     let stakedPoints: { x: number, y: number}[] = [];
     let zeroPoints: {x: number, y: number}[] = [];
@@ -85,7 +89,7 @@
 <!--            {/if}-->
 <!--        </Svg>-->
 
-        {#if closest}
+        {#if closest && supplyPoints.length > 1}
             <Svg>
                 <SvgLine data={verticalLine(closest.x)} let:d>
                     <path class="data vertical" {d}></path>
@@ -94,13 +98,13 @@
             <Point x={closest.x} y={supplyPoints[closest.x - 1].y}>
                 <span class="annotation-point"></span>
                 <div class="annotation" style="transform: translate(-{100 * ((closest.x - xMax) / (xMax - xMin))}%,0)">
-                    <strong>{nf.format(supplyPoints[closest.x - 1].y)}</strong> $FLASH
+                    <strong>{numberWithSpaces(supplyPoints[closest.x - 1].y.toFixed(0))}</strong> $FLASH
                 </div>
             </Point>
             <Point x={closest.x} y={stakedPoints[closest.x - 1].y}>
                 <span class="annotation-point"></span>
                 <div class="annotation" style="transform: translate(-{100 * ((closest.x - xMax) / (xMax - xMin))}%,0)">
-                    <strong>{nf.format(stakedPoints[closest.x - 1].y)}</strong> $FLASH
+                    <strong>{numberWithSpaces(stakedPoints[closest.x - 1].y)}</strong> $FLASH
                 </div>
             </Point>
         {/if}
@@ -154,7 +158,7 @@
         stroke: white;
         stroke-linejoin: round;
         stroke-linecap: round;
-        stroke-width: 4px;
+        stroke-width: 2px;
         fill: none;
 
         &.vertical {
@@ -183,7 +187,7 @@
         position: absolute;
         width: 10px;
         height: 10px;
-        background-color: #ff3e00;
+        @apply bg-white;
         border-radius: 50%;
         transform: translate(-50%,-50%);
     }
