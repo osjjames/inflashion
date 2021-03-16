@@ -176,13 +176,13 @@
     }
 
     .annotation {
+        @apply bg-flash-gray-900;
         position: absolute;
         white-space: nowrap;
         bottom: 1em;
         line-height: 1.2;
-        background-color: black;
         padding: 0.2em 0.4em;
-        border-radius: 2px;
+        border-radius: 0.5rem;
     }
 
     .annotation-point {
