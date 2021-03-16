@@ -134,7 +134,7 @@
         {/if}
     </Chart>
     {#if closest}
-        <div class="absolute top-2 right-2 h-4 w-4 text-flash-gray-300 pointer-events-none" class:locked>
+        <div class="absolute top-2 {mu > 0.5 ? 'left' : 'right'}-2 h-6 w-6 p-1 text-flash-gray-200 pointer-events-none bg-flash-gray-800 bg-opacity-70 rounded-full" class:locked>
             {#if locked}
                 <FaLock></FaLock>
             {:else}
