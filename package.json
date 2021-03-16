@@ -32,6 +32,7 @@
     "@sveltejs/pancake": "^0.0.17",
     "distributions-truncated-normal-pdf": "^0.0.0",
     "gaussian": "^1.2.0",
+    "moment": "^2.29.1",
     "sirv-cli": "^1.0.0",
     "svelte-icons": "^2.1.0",
     "sveltejs-tippy": "^3.0.0"

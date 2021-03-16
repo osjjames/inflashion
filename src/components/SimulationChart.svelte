@@ -3,6 +3,8 @@
     import {simulation} from "../store/simulation";
     import SvgSmoothLine from "./charts/pancakeExtensions/SvgSmoothLine.svelte";
     import type {Protocol} from "../utils/protocol";
+    import {precision, roundToInt} from "../utils/protocol";
+    import {probRound} from "../utils/probability";
 
     const numberWithSpaces = (x: number | string) => {
         let parts = x.toString().split(".");
@@ -32,14 +34,14 @@
 
     $: {
         // if (sim.protocol.totalSupply < yMin) yMin = sim.protocol.totalSupply;
-        if (sim.protocol.totalSupply > yMax) yMax = sim.protocol.totalSupply;
+        if (sim.protocol.totalSupply > yMax*precision) yMax = probRound(sim.protocol.totalSupply / precision, 1, 'CEIL');
         supplyPoints = [...supplyPoints, {
             x: sim.today,
-            y: sim.protocol.totalSupply
+            y: sim.protocol.totalSupply / precision
         }];
         stakedPoints = [...stakedPoints, {
             x: sim.today,
-            y: sim.protocol.totalStaked
+            y: sim.protocol.totalStaked / precision
         }];
         zeroPoints = [...zeroPoints, {
             x: sim.today,

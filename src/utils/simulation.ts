@@ -1,7 +1,7 @@
 import type {Agent, AgentAction} from "./agent";
 import type {TruncatedNormalDistribution} from "./probability";
-import type {Day} from "./protocol";
-import {Protocol} from "./protocol";
+import type {Day, Int} from "./protocol";
+import {Protocol, roundToInt} from "./protocol";
 import {initialiseAgents} from "./agent";
 import type {Bounds} from "./probability";
 
@@ -31,8 +31,8 @@ export class Parameter {
 }
 
 type SimulationProps = {
-    totalSupply: number,
-    population: number,
+    totalSupply: Int,
+    population: Int,
     initialDay: Day
 }
 export class Simulation {
@@ -51,17 +51,6 @@ export class Simulation {
     get today() {return this._today}
 
     public beginDay = (): Simulation => {
-        let total = 0;
-        let totalStaked = 0;
-        for (let agent of this._agents) {
-            // console.log(agent.holdings);
-            total += agent.holdings;
-            totalStaked += agent.activeStake?.amount || 0;
-        }
-        console.log(total);
-        console.log(this._protocol.totalStaked - totalStaked);
-        // this._protocol.totalSupply = total;
-        // this._protocol.totalStaked = totalStaked;
         for (let agent of this._agents) {
             const actions = agent.dailyCheck(this._today, this);
             for (let action of actions) {

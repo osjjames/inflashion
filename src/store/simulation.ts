@@ -1,7 +1,8 @@
 import {derived, writable} from 'svelte/store';
 import {Parameter, Simulation, SimulationParameters} from "../utils/simulation";
-import type {Day} from "../utils/protocol";
+import type {Day, Int} from "../utils/protocol";
 import type {TruncatedNormalDistribution} from "../utils/probability";
+import {precision, roundToInt} from "../utils/protocol";
 
 function createSimulation(initial: Simulation) {
     const simStore = writable(initial);
@@ -26,8 +27,8 @@ function createParameters(initial: SimulationParameters) {
 }
 
 export const simulation = createSimulation(new Simulation({
-    totalSupply: 1000000,
-    population: 100,
+    totalSupply: roundToInt(1000000 * precision),
+    population: 100 as Int,
     initialDay: 1
 }));
 

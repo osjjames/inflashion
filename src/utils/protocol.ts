@@ -1,72 +1,73 @@
 import type {AgentAction} from "./agent";
 import {probRound} from "./probability";
 
+export type Int = number & { __int__: void };
+export const roundToInt = (num: number): Int => Math.round(num) as Int;
+
 export type Day = number;
 
-const precision: number = 1e8;
-const round = (x: number) => probRound(x, precision, 'FLOOR');
+export const precision: number = 1e3;
+// const round = (x: number) => probRound(x, precision, 'FLOOR');
 
 type StakeProps = {
-    amount: number,
+    amount: Int,
     duration: number,
     startDay: Day,
     fpy: number
 }
 export class Stake {
-    readonly amount: number;
+    readonly amount: Int;
     readonly duration: number;
     readonly startDay: Day;
     readonly endDay: Day;
-    readonly flashYield: number;
+    readonly flashYield: Int;
 
     constructor(props: StakeProps) {
-        this.amount = round(props.amount);
+        this.amount = props.amount;
         this.duration = props.duration;
         this.startDay = props.startDay;
-        this.endDay = props.startDay + props.duration;
-        this.flashYield = round((props.amount * props.duration * props.fpy) / 365);
-        console.log(props);
-        console.log(this.flashYield);
+        this.endDay = roundToInt(props.startDay + props.duration);
+        this.flashYield = roundToInt((props.amount * props.duration * props.fpy) / 365);
     }
 }
 
 type UnstakeProps = {
     stake: Stake,
     day: Day,
-    totalStaked: number,
-    totalSupply: number
+    totalStaked: Int,
+    totalSupply: Int
 }
 export class Unstake {
     readonly stake: Stake;
     readonly day: Day;
-    readonly burned: number;
+    readonly burned: Int;
 
     constructor(props: UnstakeProps) {
         this.stake = props.stake;
         this.day = props.day;
-        this.burned = round(props.stake.amount * ((props.stake.endDay - props.day) / props.stake.duration));
+        this.burned = roundToInt(props.stake.amount * ((props.stake.endDay - props.day) / props.stake.duration));
     }
 }
 
 type ProtocolProps = {
-    totalSupply: number
+    totalSupply: Int
 }
 
 export class Protocol {
-    private _totalSupply: number; // All circulating supply
-    private _totalStaked: number; // All currently locked in a stake
+    private _totalSupply: Int; // All circulating supply
+    private _totalStaked: Int; // All currently locked in a stake
     private _fpyMatch: number; // Percent of each yield that is additionally minted for the FPY match wallet (2-20%)
-    private _totalMatched: number; // All currently in the FPY match wallet
+    private _totalMatched: Int; // All currently in the FPY match wallet
     private _fpy: number;
     private _maxStakeDuration: number;
 
     constructor(props: ProtocolProps) {
         this._totalSupply = props.totalSupply;
-        this._totalStaked = 0;
-        this._totalMatched = 0;
+        this._totalStaked = 0 as Int;
+        this._totalMatched = 0 as Int;
         this._fpyMatch = 0.02;
         this._fpy = 0.5;
-        this._maxStakeDuration = 365;
+        this._maxStakeDuration = 365 as Int;
     }
 
     get totalSupply() {return this._totalSupply}
@@ -79,41 +80,23 @@ export class Protocol {
     set totalStaked(x) {this._totalStaked = x}
 
     private registerStake = (stake: Stake) => {
-        // console.log(this._totalStaked);
-        // console.log(this._totalSupply);
-        if (this._totalStaked + stake.amount > this._totalSupply) {
-            // This guy is staking more than he can possibly stake. Actual total supply is higher than calculated total supply
-            console.log(this._totalStaked);
-            console.log(stake.amount);
-            console.log(this._totalSupply);
-            console.log(stake);
-            console.log()
-        }
-        console.log(this._totalStaked);
-        console.log(stake.amount);
-        console.log(this._totalSupply);
-        // console.log(this._totalStaked);
-        this._fpy = probRound((1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2, 1e18);
-        console.log(this._fpy);
-        this._maxStakeDuration = Math.floor((0.5 / this._fpy) * 365);
-        this._totalSupply += stake.flashYield;
-        this._totalStaked += stake.amount;
+        this._fpy = probRound((1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2, precision);
+        this._maxStakeDuration = roundToInt(Math.floor((0.5 / this._fpy) * 365));
+        this._totalSupply = roundToInt(this._totalSupply + stake.flashYield);
+        this._totalStaked = roundToInt(this._totalStaked + stake.amount);
 
-        const fpyMatchAmount = stake.flashYield * this._fpyMatch;
-        this._totalMatched += fpyMatchAmount;
-        this._totalSupply += fpyMatchAmount;
+        const fpyMatchAmount: Int = roundToInt(stake.flashYield * this._fpyMatch);
+        this._totalMatched = roundToInt(this._totalMatched + fpyMatchAmount);
+        this._totalSupply = roundToInt(this._totalSupply + fpyMatchAmount);
     }
 
     private registerUnstake = (unstake: Unstake) => {
-        // console.log(this._totalSupply);
-        // console.log(unstake.burned);
-        // console.log(unstake.stake.amount);
-        this._totalSupply -= unstake.burned;
-        this._totalStaked -= unstake.stake.amount;
+        this._totalSupply = roundToInt(this._totalSupply - unstake.burned);
+        this._totalStaked = roundToInt(this._totalStaked - unstake.stake.amount);
     }
 
     private registerStakeEnd = (stake: Stake) => {
-        this._totalStaked -= stake.amount;
+        this._totalStaked = roundToInt(this._totalStaked - stake.amount);
     }
 
     public registerAgentAction = (action: AgentAction) => {

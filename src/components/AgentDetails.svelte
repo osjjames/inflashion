@@ -3,6 +3,7 @@
     import {agentDisplay} from "../store/agentDisplay";
     import {Agent} from "../utils/agent";
     import {Stake} from "../utils/protocol";
+    import {precision} from "../utils/protocol";
 
     export let agent: Agent;
     const nf = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 });
@@ -17,10 +18,10 @@
 <div class="w-full ">
     <span><b>{agent.name}</b></span>
     <br/>
-    <span>Holdings: {agent.holdings.toFixed(0)}</span>
+    <span>Holdings: {(agent.holdings / precision)}</span>
     <br/>
     {#if agent.activeStake && agent.activeStake.amount > 0}
-        <span>Staked: {agent.activeStake.amount.toFixed(0)}</span>
+        <span>Staked: {(agent.activeStake.amount / precision)}</span>
         <br/>
         <span>Progress: {(stakeProgress*100).toFixed(0)}%</span>
         <br/>
