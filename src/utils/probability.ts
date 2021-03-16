@@ -47,12 +47,12 @@ export const randomTrunc = (dist: TruncatedNormalDistribution): number => {
 }
 
 type RoundType = 'FLOOR' | 'CEIL' | 'ROUND';
-// Rounds a random sample to a given factor
-export const probRound = (number: number, factor: number, type: RoundType = 'ROUND') => {
+// Rounds a random sample to a given precision
+export const probRound = (number: number, precision: number, type: RoundType = 'ROUND') => {
     switch(type) {
-        case "FLOOR": return Math.floor(number * factor) / factor;
-        case "CEIL": return Math.ceil(number * factor) / factor;
-        case "ROUND": return Math.round(number * factor) / factor;
+        case "FLOOR": return Math.floor(number * precision) / precision;
+        case "CEIL": return Math.ceil(number * precision) / precision;
+        case "ROUND": return Math.round(number * precision) / precision;
     }
 }
 

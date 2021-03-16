@@ -51,6 +51,17 @@ export class Simulation {
     get today() {return this._today}
 
     public beginDay = (): Simulation => {
+        let total = 0;
+        let totalStaked = 0;
+        for (let agent of this._agents) {
+            // console.log(agent.holdings);
+            total += agent.holdings;
+            totalStaked += agent.activeStake?.amount || 0;
+        }
+        console.log(total);
+        console.log(this._protocol.totalStaked - totalStaked);
+        // this._protocol.totalSupply = total;
+        // this._protocol.totalStaked = totalStaked;
         for (let agent of this._agents) {
             const actions = agent.dailyCheck(this._today, this);
             for (let action of actions) {
