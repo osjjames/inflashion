@@ -6,7 +6,7 @@ export const roundToInt = (num: number): Int => Math.round(num) as Int;
 
 export type Day = number;
 
-export const precision: number = 1e3;
+export const precision: number = 1e5;
 // const round = (x: number) => probRound(x, precision, 'FLOOR');
 
 type StakeProps = {
