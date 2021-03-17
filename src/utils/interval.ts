@@ -22,6 +22,11 @@ export class IntervalTimer{
     private lastPauseTime: number;
     private resumeId: number;
 
+    private updateFrequency = 2; // How often to update speed (Hz)
+    private intervalSamples: number[];
+    private lastUpdateTime: number;
+    public avgInterval: number;
+
     constructor(props: Props){
         this.remaining = 0;
         this.state = 'IDLE';
@@ -32,7 +37,18 @@ export class IntervalTimer{
         this.maxFires = props.maxFires || null;
         this.pausedTime = 0; //how long we've been paused for
 
+        this.intervalSamples = [];
+        this.lastUpdateTime = 0;
+        this.avgInterval = this.interval;
+
         this.fires = 0;
+    }
+
+    refreshAvgInterval() {
+        const sum = this.intervalSamples.reduce((a, b) => a + b, 0);
+        this.avgInterval = (sum / this.intervalSamples.length) || this.avgInterval;
+        this.intervalSamples = [];
+        this.lastUpdateTime = new Date().getTime();
     }
 
     proxyCallback(){
@@ -40,7 +56,13 @@ export class IntervalTimer{
             this.stop();
             return;
         }
-        this.lastTimeFired = new Date().getTime();
+        let now = new Date().getTime();
+        if (now > this.lastUpdateTime + (1000/this.updateFrequency)) {
+            this.refreshAvgInterval();
+        } else {
+            this.intervalSamples.push(now - Math.max(this.lastTimeFired, this.lastPauseTime || 0))
+        }
+        this.lastTimeFired = now;
         this.fires++;
         this.callback();
     }

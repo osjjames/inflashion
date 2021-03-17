@@ -13,6 +13,10 @@
 
     let timer: IntervalTimer;
     let buttonText: string = 'Start';
+    let intervalMs: number = 13;
+    let dps: number = 0;
+    let lastIntervalStart;
+    let actualSpeed;
 
     const formatDuration = (days: Int) => {
         const duration = moment.duration(days, 'days');
@@ -24,7 +28,7 @@
     }
 
     const togglePause = () => {
-        switch (timer.state) {
+        switch (timer?.state) {
             case 'IDLE':
                 timer.start();
                 buttonText = 'Pause';
@@ -42,6 +46,11 @@
         }
     }
 
+    const timerCallback = () => {
+        actualSpeed = timer?.avgInterval ? `${(1000/timer.avgInterval).toFixed(2)} d/s` : '';
+        simulation.nextDay();
+    }
+
     const getButtonText = (state: IntervalTimerState) => {
         switch (state) {
             case 'IDLE':
@@ -56,19 +65,23 @@
     onMount(() => {
         timer = new IntervalTimer({
             name: 'simulation',
-            callback: simulation.nextDay,
-            interval: 10
+            callback: timerCallback,
+            interval: intervalMs
         });
     });
 </script>
 
-<div class="flex flex-wrap overflow-hidden w-full border-2 border-flash-gray-600 rounded-2xl">
+<div class="flex flex-wrap overflow-hidden border-2 border-flash-gray-600 rounded-2xl mx-8">
     <SimulationStatCell name="Day" value="{sim.today}">
-        <span class="text-sm">({formatDuration(sim.today)})</span>
+        <span class="text-sm w-full text-center text-flash-gray-100 whitespace-nowrap overflow-hidden overflow-ellipsis">({formatDuration(sim.today)})</span>
     </SimulationStatCell>
     <SimulationStatCell name="FPY" value="{(sim.protocol.fpy*100).toFixed(2)} %"/>
     <SimulationStatCell name="FPY Match"/>
-    <SimulationStatCell name="Speed"/>
+    <SimulationStatCell name="Speed" value="{(1000/intervalMs).toFixed(0)} days/second">
+        {#if actualSpeed}
+            <span class="text-sm text-flash-gray-100">Actual: {actualSpeed}</span>
+        {/if}
+    </SimulationStatCell>
     <SimulationStatCell name="Total Supply" value="{(sim.protocol.totalSupply / precision).toFixed(0)}"/>
     <SimulationStatCell name="Total Staked" value="{(sim.protocol.totalStaked / precision).toFixed(0)}"/>
     <SimulationStatCell name="Total Matched" value="{(sim.protocol.totalMatched / precision).toFixed(0)}"/>
