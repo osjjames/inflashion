@@ -8,13 +8,14 @@
     import {precision} from "../utils/protocol";
     import Button from "./input/Button.svelte";
     import SimulationStatCell from "./SimulationStatCell.svelte";
+    import Slider from "./input/Slider.svelte";
 
     $: sim = $simulation;
 
     let timer: IntervalTimer;
     let buttonText: string = 'Start';
-    let intervalMs: number = 13;
-    let dps: number = 0;
+    // let intervalMs: number = 13;
+    let dps: number = 2;
     let lastIntervalStart;
     let actualSpeed;
 
@@ -47,7 +48,7 @@
     }
 
     const timerCallback = () => {
-        actualSpeed = timer?.avgInterval ? `${(1000/timer.avgInterval).toFixed(2)} d/s` : '';
+        actualSpeed = timer?.avgInterval ? `${(1000 / timer.avgInterval).toFixed(1)} d/s` : '';
         simulation.nextDay();
     }
 
@@ -69,6 +70,9 @@
             interval: intervalMs
         });
     });
+
+    $: intervalMs = 1000/dps;
+    $: timer?.setInterval(intervalMs);
 </script>
 
 <div class="flex flex-wrap overflow-hidden border-2 border-flash-gray-600 rounded-2xl md:mx-8">
@@ -77,7 +81,8 @@
     </SimulationStatCell>
     <SimulationStatCell name="FPY" value="{(sim.protocol.fpy*100).toFixed(2)} %"/>
     <SimulationStatCell name="FPY Match"/>
-    <SimulationStatCell name="Speed" value="{(1000/intervalMs).toFixed(0)} days/second">
+    <SimulationStatCell name="Speed" value="{dps.toFixed(0)} days/second">
+        <Slider inputClass={`w-36`} min="2" max="100" stepCount="50" bind:value={dps}></Slider>
         {#if actualSpeed}
             <span class="text-sm text-flash-gray-100">Actual: {actualSpeed}</span>
         {/if}
