@@ -71,7 +71,7 @@
     });
 </script>
 
-<div class="flex flex-wrap overflow-hidden border-2 border-flash-gray-600 rounded-2xl mx-8">
+<div class="flex flex-wrap overflow-hidden border-2 border-flash-gray-600 rounded-2xl md:mx-8">
     <SimulationStatCell name="Day" value="{sim.today}">
         <span class="text-sm w-full text-center text-flash-gray-100 whitespace-nowrap overflow-hidden overflow-ellipsis">({formatDuration(sim.today)})</span>
     </SimulationStatCell>
@@ -86,6 +86,6 @@
     <SimulationStatCell name="Total Staked" value="{(sim.protocol.totalStaked / precision).toFixed(0)}"/>
     <SimulationStatCell name="Total Matched" value="{(sim.protocol.totalMatched / precision).toFixed(0)}"/>
     <SimulationStatCell>
-        <Button onClick={togglePause} width={48} height={16}>{buttonText}</Button>
+        <Button onClick={togglePause} width={40} height={16}>{buttonText}</Button>
     </SimulationStatCell>
 </div>
