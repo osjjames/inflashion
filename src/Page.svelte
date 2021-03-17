@@ -4,7 +4,7 @@
     import AgentPanel from "./components/AgentPanel.svelte";
 </script>
 
-<div class="flex flex-col items-center p-4 w-full h-full overflow-hidden">
+<div class="flex flex-col items-center p-4 w-full h-full overflow-x-hidden overflow-y-scroll">
     <div class="w-full h-48 text-center">
         <h1>Flash inflation</h1>
     </div>
