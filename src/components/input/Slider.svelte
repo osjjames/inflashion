@@ -1,4 +1,6 @@
 <script lang="ts">
+    import {onMount} from "svelte";
+
     export let min: number;
     export let max: number;
     export let stepCount: number;
@@ -6,6 +8,7 @@
     export let inputClass: string = '';
     export let vertical: boolean = false;
     export let gaussian: boolean = false;
+    let slider;
 
     // Squish factor, the smaller it is the more the slider caters to small values
     const squish = 0.5;
@@ -30,15 +33,36 @@
     $: if (log) {
         value = linToLog(linValue);
     }
+
+    const disableScroll = () => {
+        // Get the current page scroll position
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        let scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+        // if any scroll is attempted, set this to the previous value
+        window.onscroll = () => window.scrollTo(scrollLeft, scrollTop);
+    }
+    const enableScroll = () => {
+        window.onscroll = () => {};
+    }
+
+    onMount(() => {
+        slider?.addEventListener('touchstart', function(e) {
+            disableScroll();
+        }, false);
+        slider?.addEventListener('touchend', function(e) {
+            enableScroll();
+        }, false);
+    })
 </script>
 
 <div class:vertical class:gaussian>
     {#if log}
-        <input type="range" {min} max={min+1} step={1/stepCount} bind:value={linValue}
+        <input bind:this={slider} type="range" {min} max={min+1} step={1/stepCount} bind:value={linValue}
             class="{inputClass}"
         />
     {:else}
-        <input type="range" {min} {max} step={(max-min)/stepCount} bind:value={value}
+        <input bind:this={slider} type="range" {min} {max} step={(max-min)/stepCount} bind:value={value}
                class="{inputClass}"
         />
     {/if}
