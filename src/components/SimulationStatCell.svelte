@@ -3,7 +3,7 @@
     export let value: string;
 </script>
 
-<div class="w-1/2 overflow-hidden md:w-1/4">
+<div class="w-1/2 overflow-hidden lg:w-1/4 p-2">
     <div class="w-full h-full flex flex-col items-center p-2">
         {#if name}
             <span class="font-semibold">{name}</span>
