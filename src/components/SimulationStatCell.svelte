@@ -1,4 +1,6 @@
 <script lang="ts">
+    import {numberWithSpaces} from "../utils/format";
+
     export let name: string;
     export let value: string;
 </script>
@@ -10,7 +12,7 @@
         {/if}
         <div class="flex flex-col justify-center items-center h-full">
             {#if value}
-                <span class="text-xl">{value}</span>
+                <span class="text-xl">{numberWithSpaces(value)}</span>
             {/if}
             <slot></slot>
         </div>

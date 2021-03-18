@@ -5,12 +5,8 @@
     import type {Protocol} from "../utils/protocol";
     import {precision, roundToInt} from "../utils/protocol";
     import {probRound} from "../utils/probability";
+    import {numberWithSpaces} from "../utils/format";
 
-    const numberWithSpaces = (x: number | string) => {
-        let parts = x.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-        return parts.join(".");
-    }
     let supplyPoints: { x: number, y: number}[] = [];
     let stakedPoints: { x: number, y: number}[] = [];
     let zeroPoints: {x: number, y: number}[] = [];
