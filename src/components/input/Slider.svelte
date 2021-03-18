@@ -4,6 +4,7 @@
     export let min: number;
     export let max: number;
     export let stepCount: number;
+    export let step: number;
     export let value: number;
     export let inputClass: string = '';
     export let vertical: boolean = false;
@@ -32,6 +33,7 @@
     $: if (log) {
         value = linToLog(linValue);
     }
+    $: stepBinding = step || (log ? 1/stepCount : (max-min)/stepCount) || max-min;
 
     const disableScroll = () => {
         // Get the current page scroll position
@@ -54,7 +56,8 @@
             type="range"
             {min}
             max={min+1}
-            step={1/stepCount} bind:value={linValue}
+            step={stepBinding}
+            bind:value={linValue}
             class="{inputClass}"
         />
     {:else}
@@ -64,7 +67,7 @@
             type="range"
             {min}
             {max}
-            step={(max-min)/stepCount}
+            step={stepBinding}
             bind:value={value}
             class="{inputClass}"
         />
