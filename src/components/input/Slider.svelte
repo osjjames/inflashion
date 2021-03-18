@@ -8,7 +8,6 @@
     export let inputClass: string = '';
     export let vertical: boolean = false;
     export let gaussian: boolean = false;
-    let slider;
 
     // Squish factor, the smaller it is the more the slider caters to small values
     const squish = 0.5;
@@ -45,25 +44,29 @@
     const enableScroll = () => {
         window.onscroll = () => {};
     }
-
-    onMount(() => {
-        slider?.addEventListener('touchstart', function(e) {
-            disableScroll();
-        }, false);
-        slider?.addEventListener('touchend', function(e) {
-            enableScroll();
-        }, false);
-    })
 </script>
 
 <div class:vertical class:gaussian>
     {#if log}
-        <input bind:this={slider} type="range" {min} max={min+1} step={1/stepCount} bind:value={linValue}
+        <input
+            on:touchstart={e => disableScroll()}
+            on:touchend={e => enableScroll()}
+            type="range"
+            {min}
+            max={min+1}
+            step={1/stepCount} bind:value={linValue}
             class="{inputClass}"
         />
     {:else}
-        <input bind:this={slider} type="range" {min} {max} step={(max-min)/stepCount} bind:value={value}
-               class="{inputClass}"
+        <input
+            on:touchstart={e => disableScroll()}
+            on:touchend={e => enableScroll()}
+            type="range"
+            {min}
+            {max}
+            step={(max-min)/stepCount}
+            bind:value={value}
+            class="{inputClass}"
         />
     {/if}
 </div>
