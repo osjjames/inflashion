@@ -75,13 +75,17 @@
     $: timer?.setInterval(intervalMs);
 </script>
 
-<div class="flex flex-wrap overflow-hidden border-2 border-flash-gray-600 rounded-2xl md:mx-8">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden md:mx-8">
     <SimulationStatCell name="Day" value="{sim.today}">
         <span class="text-sm w-full text-center text-flash-gray-100 whitespace-nowrap overflow-hidden overflow-ellipsis">({formatDuration(sim.today)})</span>
     </SimulationStatCell>
     <SimulationStatCell name="FPY" value="{(sim.protocol.fpy*100).toFixed(2)} %"/>
     <SimulationStatCell name="FPY Match"/>
-    <SimulationStatCell name="Speed" value="{dps.toFixed(0)} days/second">
+    <SimulationStatCell name="Speed">
+        <div>
+            <span class="text-xl">{dps.toFixed(0)}&nbsp;</span>
+            <span class="text-sm">days per second</span>
+        </div>
         <Slider inputClass={`w-36`} min="2" max="100" stepCount="50" bind:value={dps}></Slider>
         {#if actualSpeed}
             <span class="text-sm text-flash-gray-100">Actual: {actualSpeed}</span>
@@ -90,7 +94,8 @@
     <SimulationStatCell name="Total Supply" value="{(sim.protocol.totalSupply / precision).toFixed(0)}"/>
     <SimulationStatCell name="Total Staked" value="{(sim.protocol.totalStaked / precision).toFixed(0)}"/>
     <SimulationStatCell name="Total Matched" value="{(sim.protocol.totalMatched / precision).toFixed(0)}"/>
-    <SimulationStatCell>
+    <div class="flex justify-center items-center">
         <Button onClick={togglePause} width={40} height={16}>{buttonText}</Button>
-    </SimulationStatCell>
+    </div>
+
 </div>
