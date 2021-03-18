@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {simulation} from "../store/simulation";
+    import {simulation, fpyMatch} from "../store/simulation";
     import {IntervalTimer} from "../utils/interval";
     import type {IntervalTimerState} from "../utils/interval";
     import moment from "moment";
@@ -14,7 +14,6 @@
 
     let timer: IntervalTimer;
     let buttonText: string = 'Start';
-    // let intervalMs: number = 13;
     let dps: number = 2;
     let lastIntervalStart;
     let actualSpeed;
@@ -80,13 +79,15 @@
         <span class="text-sm w-full text-center text-flash-gray-100 whitespace-nowrap overflow-hidden overflow-ellipsis">({formatDuration(sim.today)})</span>
     </SimulationStatCell>
     <SimulationStatCell name="FPY" value="{(sim.protocol.fpy*100).toFixed(2)} %"/>
-    <SimulationStatCell name="FPY Match"/>
+    <SimulationStatCell name="FPY Match" value="{($fpyMatch * 100).toFixed(0)} %">
+        <Slider inputClass={`w-36`} min="0.02" max="0.2" step="0.01" bind:value={$fpyMatch}></Slider>
+    </SimulationStatCell>
     <SimulationStatCell name="Speed">
         <div>
             <span class="text-xl">{dps.toFixed(0)}&nbsp;</span>
             <span class="text-sm">days per second</span>
         </div>
-        <Slider inputClass={`w-36`} min="2" max="100" stepCount="50" bind:value={dps}></Slider>
+        <Slider inputClass={`w-36`} min="2" max="100" step="2" bind:value={dps}></Slider>
         {#if actualSpeed}
             <span class="text-sm text-flash-gray-100">Actual: {actualSpeed}</span>
         {/if}

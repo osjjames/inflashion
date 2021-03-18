@@ -1,5 +1,7 @@
 import type {AgentAction} from "./agent";
 import {probRound} from "./probability";
+import {SimulationParameters} from "./simulation";
+import {fpyMatch} from "../store/simulation";
 
 export type Int = number & { __int__: void };
 export const roundToInt = (num: number): Int => Math.round(num) as Int;
@@ -56,7 +58,6 @@ type ProtocolProps = {
 export class Protocol {
     private _totalSupply: Int; // All circulating supply
     private _totalStaked: Int; // All currently locked in a stake
-    private _fpyMatch: number; // Percent of each yield that is additionally minted for the FPY match wallet (2-20%)
     private _totalMatched: Int; // All currently in the FPY match wallet
     private _fpy: number;
     private _maxStakeDuration: number;
@@ -65,7 +66,6 @@ export class Protocol {
         this._totalSupply = props.totalSupply;
         this._totalStaked = 0 as Int;
         this._totalMatched = 0 as Int;
-        this._fpyMatch = 0.02;
         this._fpy = 0.5;
         this._maxStakeDuration = 365 as Int;
     }
@@ -73,19 +73,21 @@ export class Protocol {
     get totalSupply() {return this._totalSupply}
     get totalStaked() {return this._totalStaked}
     get totalMatched() {return this._totalMatched}
-    get fpyMatch() {return this._fpyMatch}
     get fpy() {return this._fpy}
     get maxStakeDuration() {return this._maxStakeDuration}
     set totalSupply(x) {this._totalSupply = x}
     set totalStaked(x) {this._totalStaked = x}
 
     private registerStake = (stake: Stake) => {
+        let currentFpyMatch: number;
+        fpyMatch.subscribe(x => currentFpyMatch = x);
+
         this._fpy = probRound((1 - ((this._totalStaked + stake.amount) / this._totalSupply)) / 2, precision);
         this._maxStakeDuration = roundToInt(Math.floor((0.5 / this._fpy) * 365));
         this._totalSupply = roundToInt(this._totalSupply + stake.flashYield);
         this._totalStaked = roundToInt(this._totalStaked + stake.amount);
 
-        const fpyMatchAmount: Int = roundToInt(stake.flashYield * this._fpyMatch);
+        const fpyMatchAmount: Int = roundToInt(stake.flashYield * currentFpyMatch);
         this._totalMatched = roundToInt(this._totalMatched + fpyMatchAmount);
         this._totalSupply = roundToInt(this._totalSupply + fpyMatchAmount);
     }

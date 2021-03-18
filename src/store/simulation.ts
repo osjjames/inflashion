@@ -19,12 +19,9 @@ function createSimulation(initial: Simulation) {
 
 function createParameters(initial: SimulationParameters) {
     return writable(initial);
-    // const { subscribe, set, update } = paramsStore;
-    //
-    // return {
-    //     subscribe
-    // };
 }
+
+const createFpyMatch = (initial: number) => writable(initial); // Percent of each yield that is additionally minted for the FPY match wallet (2-20%)
 
 export const simulation = createSimulation(new Simulation({
     totalSupply: roundToInt(1000000 * precision),
@@ -94,3 +91,5 @@ export const parameters = createParameters({
         })
     }))
 });
+
+export const fpyMatch = createFpyMatch(0.1);
