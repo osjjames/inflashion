@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Chart, Grid, Svg, SvgLine, Point, Quadtree} from '@sveltejs/pancake';
+    import {Chart, Grid, Quadtree} from '@sveltejs/pancake';
     import {simulation} from "../../store/simulation";
     import {precision} from "../../utils/protocol";
     import {probRound} from "../../utils/probability";
@@ -18,7 +18,7 @@
     let closest = undefined;
     let annotationOffset: { x: number, y: number } = {x: 0, y: 0};
 
-    let window = 1000;
+    let window = 365;
 
     $: sim = $simulation;
 
@@ -33,8 +33,6 @@
     }
 
     $: {
-        // if (sim.protocol.totalSupply < yMin) yMin = sim.protocol.totalSupply;
-        if (sim.protocol.totalSupply > yMax * precision) yMax = probRound(sim.protocol.totalSupply / precision, 1, 'CEIL');
         supplyPoints = [...supplyPoints, {
             x: sim.today,
             y: sim.protocol.totalSupply / precision
@@ -53,6 +51,7 @@
         }];
         xMax = sim.today;
         xMin = Math.max(sim.today - window, 0);
+        yMax = yMax = probRound(Math.max(...(supplyPoints.slice(0-window).map(p=>p.y))), 1, 'CEIL');
     }
     $: {
         if (closest) {
@@ -67,7 +66,7 @@
     }
 </script>
 
-<div class="w-full h-96 p-12 ml-24">
+<div class="w-full h-96 p-12">
     <Chart x1={Math.max(xMin, xMax - window)} x2={xMax} y1={yMin} y2={yMax} class="relative cursor-crosshair">
         <Grid horizontal count={5} let:value>
             <div class="relative block border-b text-right border-flash-gray-300 opacity-80 border-dashed w-full">
