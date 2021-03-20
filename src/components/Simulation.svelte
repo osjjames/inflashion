@@ -1,5 +1,5 @@
 <script lang="ts">
-    import SimulationChart from "./SimulationChart.svelte";
+    import SimulationChart from "./charts/SimulationChart.svelte";
     import SimulationStats from "./SimulationStats.svelte";
 </script>
 

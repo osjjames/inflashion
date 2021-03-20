@@ -16,7 +16,8 @@ module.exports = {
         },
         stroke: theme => ({
             'current': 'currentColor',
-            'white': theme('colors.flash-gray.50'),
+            'white': theme('colors["flash-gray"].50'),
+            'gray': theme('colors["flash-gray"].300'),
             'palette': {
                 '1': theme('colors["flash-palette"].1'),
                 '2': theme('colors["flash-palette"].2'),
