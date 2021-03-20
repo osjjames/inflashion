@@ -9,8 +9,22 @@ module.exports = {
             sans: ['Montserrat', ...defaultTheme.fontFamily.sans]
         },
         boxShadow: {
-            'flash-blue': '0px 0px 15px -2px rgba(36,197,210,0.7)'
+            'flash-blue': '0px 0px 15px -2px rgba(36,197,210,0.7)',
+            'palette-1': '0px 0px 6px 0px #E62B96',
+            'palette-2': '0px 0px 6px 0px #b16ddf',
+            'palette-3': '0px 0px 6px 0px #4e98fd'
         },
+        stroke: theme => ({
+            'current': 'currentColor',
+            'white': theme('colors.flash-gray.50'),
+            'palette': {
+                '1': theme('colors["flash-palette"].1'),
+                '2': theme('colors["flash-palette"].2'),
+                '3': theme('colors["flash-palette"].3'),
+                '4': theme('colors["flash-palette"].4'),
+                '5': theme('colors["flash-palette"].5'),
+            }
+        }),
         extend: {
             colors: {
                 'flash-pink': '#E62B96',
@@ -23,6 +37,13 @@ module.exports = {
                     '600': '#29282D', // disabled buttons
                     '800': '#212025', // lighter bg
                     '900': '#1A191E'  // darker bg
+                },
+                'flash-palette': {
+                    '1': '#E62B96',
+                    '2': '#b16ddf',
+                    '3': '#4e98fd',
+                    '4': '#00b4f2',
+                    '5': '#24c5d2'
                 }
             },
             gridTemplateColumns: {

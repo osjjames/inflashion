@@ -74,7 +74,7 @@
     $: timer?.setInterval(intervalMs);
 </script>
 
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden md:mx-8">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden mb-16 md:mx-8">
     <SimulationStatCell name="Day" value="{sim.today}">
         <span class="text-sm w-full text-center text-flash-gray-100 whitespace-nowrap overflow-hidden overflow-ellipsis">({formatDuration(sim.today)})</span>
     </SimulationStatCell>

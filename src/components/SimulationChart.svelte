@@ -9,12 +9,16 @@
 
     let supplyPoints: { x: number, y: number}[] = [];
     let stakedPoints: { x: number, y: number}[] = [];
+    let matchedPoints: { x: number, y: number}[] = [];
     let zeroPoints: {x: number, y: number}[] = [];
     let xMin = 0;
     let xMax = supplyPoints.length;
     let yMin: number = 0;
     let yMax: number = -Infinity;
     let closest = undefined;
+    let annotationOffset: {x: number, y: number} = {x: 0, y: 0};
+
+    let window = 1000;
 
     $: sim = $simulation;
 
@@ -39,16 +43,32 @@
             x: sim.today,
             y: sim.protocol.totalStaked / precision
         }];
+        matchedPoints = [...matchedPoints, {
+            x: sim.today,
+            y: sim.protocol.totalMatched / precision
+        }];
         zeroPoints = [...zeroPoints, {
             x: sim.today,
             y: 0
         }];
         xMax = sim.today;
+        xMin = Math.max(sim.today-window, 0);
+    }
+    $: {
+        if (closest) {
+            let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
+            annotationOffset = {
+                x: xPercent,
+                y: 0
+            };
+        } else {
+            annotationOffset = {x: 0, y: 0};
+        }
     }
 </script>
 
 <div class="w-full h-96 p-12">
-    <Chart x1={xMin} x2={xMax} y1={yMin} y2={yMax}>
+    <Chart x1={Math.max(xMin, xMax - window)} x2={xMax} y1={yMin} y2={yMax} class="relative">
         <Grid horizontal count={5} let:value>
             <div class="grid-line horizontal"><span>{value}</span></div>
         </Grid>
@@ -59,33 +79,25 @@
 
         {#if supplyPoints.length > 1}
         <Svg>
-            <SvgLine data={supplyPoints} let:d>
-                <path class="data" {d}></path>
+            <SvgLine data={supplyPoints.slice(0-window)} let:d>
+                <path class="data stroke-palette-1" {d}></path>
             </SvgLine>
         </Svg>
         {/if}
-
         {#if stakedPoints.length > 1}
             <Svg>
-                <SvgLine data={stakedPoints} let:d>
-                    <path class="data" {d}></path>
+                <SvgLine data={stakedPoints.slice(0-window)} let:d>
+                    <path class="data stroke-palette-2" {d}></path>
                 </SvgLine>
             </Svg>
         {/if}
-
-<!--        <Svg>-->
-<!--            {#each filtered as country}-->
-<!--                <SvgLine data={country.data} let:d>-->
-<!--                    <path class="data" {d}></path>-->
-<!--                </SvgLine>-->
-<!--            {/each}-->
-
-<!--            {#if closest}-->
-<!--                <SvgLine data={closest.country.data} let:d>-->
-<!--                    <path class="highlight" {d}></path>-->
-<!--                </SvgLine>-->
-<!--            {/if}-->
-<!--        </Svg>-->
+        {#if matchedPoints.length > 1}
+            <Svg>
+                <SvgLine data={matchedPoints.slice(0-window)} let:d>
+                    <path class="data stroke-palette-3" {d}></path>
+                </SvgLine>
+            </Svg>
+        {/if}
 
         {#if closest && supplyPoints.length > 1}
             <Svg>
@@ -94,17 +106,36 @@
                 </SvgLine>
             </Svg>
             <Point x={closest.x} y={supplyPoints[closest.x - 1].y}>
-                <span class="annotation-point"></span>
-                <div class="annotation" style="transform: translate(-{100 * ((closest.x - xMax) / (xMax - xMin))}%,0)">
-                    <strong>{numberWithSpaces(supplyPoints[closest.x - 1].y.toFixed(0))}</strong> $FLASH
-                </div>
+                <span class="annotation-point bg-flash-palette-1 shadow-palette-1"></span>
             </Point>
             <Point x={closest.x} y={stakedPoints[closest.x - 1].y}>
-                <span class="annotation-point"></span>
-                <div class="annotation" style="transform: translate(-{100 * ((closest.x - xMax) / (xMax - xMin))}%,0)">
-                    <strong>{numberWithSpaces(stakedPoints[closest.x - 1].y)}</strong> $FLASH
-                </div>
+                <span class="annotation-point bg-flash-palette-2 shadow-palette-2"></span>
             </Point>
+            <Point x={closest.x} y={matchedPoints[closest.x - 1].y}>
+                <span class="annotation-point bg-flash-palette-3 shadow-palette-3"></span>
+            </Point>
+            <div class="annotation bg-flash-gray-800 bg-opacity-80 w-80 h-16 flex absolute whitespace-nowrap bottom-4 leading-tight rounded-lg box-border"
+                 style="left: max(calc({annotationOffset.x}% - 20rem), 1rem); top: calc(-4rem - 0.5rem);">
+                <div class="mr-3">
+                    Total Supply:<br/>
+                    Total Staked:<br/>
+                    Total Matched:
+                </div>
+                <div class="flex justify-between w-full">
+                    <div>
+                        <b class="text-flash-palette-1">{numberWithSpaces(supplyPoints[closest.x - 1].y.toFixed(0))}</b>
+                        <br/>
+                        <b class="text-flash-palette-2">{numberWithSpaces(stakedPoints[closest.x - 1].y.toFixed(0))}</b>
+                        <br/>
+                        <b class="text-flash-palette-3">{numberWithSpaces(matchedPoints[closest.x - 1].y.toFixed(0))}</b>
+                    </div>
+                    <div>
+                        $FLASH<br/>
+                        $FLASH<br/>
+                        $FLASH
+                    </div>
+                </div>
+            </div>
         {/if}
 
         <Quadtree data={zeroPoints} bind:closest/>
@@ -153,10 +184,9 @@
     }
 
     path.data {
-        stroke: white;
         stroke-linejoin: round;
         stroke-linecap: round;
-        stroke-width: 2px;
+        stroke-width: 3px;
         fill: none;
 
         &.vertical {
@@ -172,20 +202,13 @@
     }
 
     .annotation {
-        @apply bg-flash-gray-900;
-        position: absolute;
-        white-space: nowrap;
-        bottom: 1em;
-        line-height: 1.2;
         padding: 0.2em 0.4em;
-        border-radius: 0.5rem;
     }
 
     .annotation-point {
         position: absolute;
         width: 10px;
         height: 10px;
-        @apply bg-white;
         border-radius: 50%;
         transform: translate(-50%,-50%);
     }
