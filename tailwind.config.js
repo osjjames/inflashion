@@ -59,6 +59,9 @@ module.exports = {
             },
             cursor: {
                 'crosshair': 'crosshair'
+            },
+            height: {
+                'fit': 'fit-content'
             }
         }
     },
