@@ -7,11 +7,13 @@
     import ChartPoint from "./ChartPoint.svelte";
     import ChartLine from "./ChartLine.svelte";
     import ButtonSmall from "../input/ButtonSmall.svelte";
+    import type {WindowLength} from "../../utils/chart";
+    import {getWindow, sliceToWindow} from "../../utils/chart";
 
-    let supplyPoints: { x: number, y: number }[] = [];
-    let stakedPoints: { x: number, y: number }[] = [];
-    let matchedPoints: { x: number, y: number }[] = [];
-    let zeroPoints: { x: number, y: number }[] = [];
+    let supplyPoints: ChartPoint[] = [];
+    let stakedPoints: ChartPoint[] = [];
+    let matchedPoints: ChartPoint[] = [];
+    let zeroPoints: ChartPoint[] = [];
     let xMin = 0;
     let xMax = supplyPoints.length;
     let yMin: number = 0;
@@ -21,32 +23,11 @@
 
     let windowLength: WindowLength = 'year';
 
+
     $: sim = $simulation;
-
-    // let yMin: number = sim.protocol.totalSupply;
-    // let yMax: number = sim.protocol.totalSupply;
-    // let supplyPoints: {x: number, y: number}[] = [{
-    //     x: 0, y: sim.protocol.totalSupply
-    // }];
-
-    type WindowLength = 'week' | 'month' | 'year' | '5year' | 'all';
-    const getWindow = (length: WindowLength): number => {
-        switch (length) {
-            case 'week': return 7;
-            case 'month': return 30;
-            case 'year': return 365;
-            case '5year': return 1825;
-            case 'all': return supplyPoints.length;
-        }
-    }
 
     const verticalLine = (day: number): Array<{ x: number, y: number }> => {
         return [{x: day, y: 0}, {x: day, y: yMax}];
-    }
-
-    const sliceToWindow = (array: any[]) => {
-        if (windowLength === 'all') return array;
-        return array.slice(0 - getWindow(windowLength));
     }
 
     $: {
@@ -67,25 +48,23 @@
             y: 0
         }];
         xMax = sim.today;
-        xMin = Math.max(sim.today - getWindow(windowLength), 0);
-        yMax = yMax = probRound(Math.max(...(sliceToWindow(supplyPoints).map(p => p.y))), 1, 'CEIL');
+        xMin = Math.max(sim.today - getWindow(windowLength, supplyPoints.length), 0);
+        yMax = yMax = probRound(Math.max(...(sliceToWindow(supplyPoints, windowLength, supplyPoints.length).map(p => p.y))), 1, 'CEIL');
     }
-    $: {
-        if (closest) {
-            let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
-            annotationOffset = {
-                x: xPercent,
-                y: 0
-            };
-        } else {
-            annotationOffset = {x: 0, y: 0};
-        }
+    $: if (closest) {
+        let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
+        annotationOffset = {
+            x: xPercent,
+            y: 0
+        };
+    } else {
+        annotationOffset = {x: 0, y: 0};
     }
 </script>
 
 <div class="w-full h-96 p-12 pt-0 flex flex-col">
     <div class="flex justify-end">
-        <div class="flex">
+        <div class="flex mb-4">
             <ButtonSmall onClick={() => windowLength = 'week'} selected={windowLength === 'week'}>1W</ButtonSmall>
             <ButtonSmall onClick={() => windowLength = 'month'} selected={windowLength === 'month'}>1M</ButtonSmall>
             <ButtonSmall onClick={() => windowLength = 'year'} selected={windowLength === 'year'}>1Y</ButtonSmall>
@@ -105,13 +84,13 @@
         </Grid>
 
         {#if supplyPoints.length > 1}
-            <ChartLine data={sliceToWindow(supplyPoints)} pathClass="stroke-palette-1"/>
+            <ChartLine data={sliceToWindow(supplyPoints, windowLength, supplyPoints.length)} pathClass="stroke-palette-1"/>
         {/if}
         {#if stakedPoints.length > 1}
-            <ChartLine data={sliceToWindow(stakedPoints)} pathClass="stroke-palette-2"/>
+            <ChartLine data={sliceToWindow(stakedPoints, windowLength, supplyPoints.length)} pathClass="stroke-palette-2"/>
         {/if}
         {#if matchedPoints.length > 1}
-            <ChartLine data={sliceToWindow(matchedPoints)} pathClass="stroke-palette-3"/>
+            <ChartLine data={sliceToWindow(matchedPoints, windowLength, supplyPoints.length)} pathClass="stroke-palette-3"/>
         {/if}
 
         {#if closest && supplyPoints.length > 1}
@@ -143,7 +122,7 @@
             </div>
         {/if}
 
-        <Quadtree data={sliceToWindow(zeroPoints)} bind:closest/>
+        <Quadtree data={sliceToWindow(zeroPoints, windowLength, supplyPoints.length)} bind:closest/>
     </Chart>
 </div>
 

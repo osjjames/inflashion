@@ -31,6 +31,7 @@
   "dependencies": {
     "@sveltejs/pancake": "^0.0.17",
     "distributions-truncated-normal-pdf": "^0.0.0",
+    "downsample": "^1.4.0",
     "gaussian": "^1.2.0",
     "moment": "^2.29.1",
     "sirv-cli": "^1.0.0",
