@@ -7,50 +7,63 @@
     import ChartPoint from "./ChartPoint.svelte";
     import ChartLine from "./ChartLine.svelte";
     import ButtonSmall from "../input/ButtonSmall.svelte";
-    import type {WindowLength} from "../../utils/chart";
-    import {getWindow, sliceToWindow} from "../../utils/chart";
+    import type {WindowLength, Point2} from "../../utils/chart";
+    import {getWindow, LineData} from "../../utils/chart";
 
-    let supplyPoints: ChartPoint[] = [];
-    let stakedPoints: ChartPoint[] = [];
-    let matchedPoints: ChartPoint[] = [];
-    let zeroPoints: ChartPoint[] = [];
+    let supplyPoints: LineData = new LineData();
+    let stakedPoints: LineData = new LineData();
+    let matchedPoints: LineData = new LineData();
+    let zeroPoints: LineData = new LineData();
+
+    let supplyPointsSliced: Point2[] = [];
+    let stakedPointsSliced: Point2[] = [];
+    let matchedPointsSliced: Point2[] = [];
+    let zeroPointsSliced: Point2[] = [];
+
     let xMin = 0;
     let xMax = supplyPoints.length;
     let yMin: number = 0;
     let yMax: number = -Infinity;
     let closest = undefined;
-    let annotationOffset: { x: number, y: number } = {x: 0, y: 0};
+    let annotationOffset: Point2 = {x: 0, y: 0};
 
     let windowLength: WindowLength = 'year';
 
 
     $: sim = $simulation;
 
-    const verticalLine = (day: number): Array<{ x: number, y: number }> => {
+    const verticalLine = (day: number): Array<Point2> => {
         return [{x: day, y: 0}, {x: day, y: yMax}];
     }
 
     $: {
-        supplyPoints = [...supplyPoints, {
+        supplyPoints.addPoint({
             x: sim.today,
             y: sim.protocol.totalSupply / precision
-        }];
-        stakedPoints = [...stakedPoints, {
+        });
+        stakedPoints.addPoint({
             x: sim.today,
             y: sim.protocol.totalStaked / precision
-        }];
-        matchedPoints = [...matchedPoints, {
+        });
+        matchedPoints.addPoint({
             x: sim.today,
             y: sim.protocol.totalMatched / precision
-        }];
-        zeroPoints = [...zeroPoints, {
+        });
+        zeroPoints.addPoint({
             x: sim.today,
             y: 0
-        }];
+        });
+
         xMax = sim.today;
         xMin = Math.max(sim.today - getWindow(windowLength, supplyPoints.length), 0);
-        yMax = yMax = probRound(Math.max(...(sliceToWindow(supplyPoints, windowLength, supplyPoints.length).map(p => p.y))), 1, 'CEIL');
+        yMax = yMax = probRound(Math.max(...(supplyPoints.sliceToWindow(windowLength).map(p => p.y))), 1, 'CEIL');
+
+        supplyPointsSliced = supplyPoints.sliceToWindow(windowLength);
+        stakedPointsSliced = stakedPoints.sliceToWindow(windowLength);
+        matchedPointsSliced = matchedPoints.sliceToWindow(windowLength);
+        zeroPointsSliced = zeroPoints.sliceToWindow(windowLength);
     }
+
     $: if (closest) {
         let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
         annotationOffset = {
@@ -83,21 +96,21 @@
             <span class="x-label">{numberWithSpaces(value)}</span>
         </Grid>
 
-        {#if supplyPoints.length > 1}
-            <ChartLine data={sliceToWindow(supplyPoints, windowLength, supplyPoints.length)} pathClass="stroke-palette-1"/>
+        {#if supplyPointsSliced.length > 1}
+            <ChartLine data={supplyPointsSliced} pathClass="stroke-palette-1"/>
         {/if}
-        {#if stakedPoints.length > 1}
-            <ChartLine data={sliceToWindow(stakedPoints, windowLength, supplyPoints.length)} pathClass="stroke-palette-2"/>
+        {#if stakedPointsSliced.length > 1}
+            <ChartLine data={stakedPointsSliced} pathClass="stroke-palette-2"/>
         {/if}
-        {#if matchedPoints.length > 1}
-            <ChartLine data={sliceToWindow(matchedPoints, windowLength, supplyPoints.length)} pathClass="stroke-palette-3"/>
+        {#if matchedPointsSliced.length > 1}
+            <ChartLine data={matchedPointsSliced} pathClass="stroke-palette-3"/>
         {/if}
 
         {#if closest && supplyPoints.length > 1}
             <ChartLine data={verticalLine(closest.x)} pathClass="stroke-2 stroke-gray"/>
-            <ChartPoint x={closest.x} y={supplyPoints[closest.x - 1].y} innerClass="bg-flash-palette-1 shadow-palette-1"/>
-            <ChartPoint x={closest.x} y={stakedPoints[closest.x - 1].y} innerClass="bg-flash-palette-2 shadow-palette-2"/>
-            <ChartPoint x={closest.x} y={matchedPoints[closest.x - 1].y}  innerClass="bg-flash-palette-3 shadow-palette-3"/>
+            <ChartPoint x={closest.x} y={supplyPoints.all[closest.x - 1].y} innerClass="bg-flash-palette-1 shadow-palette-1"/>
+            <ChartPoint x={closest.x} y={stakedPoints.all[closest.x - 1].y} innerClass="bg-flash-palette-2 shadow-palette-2"/>
+            <ChartPoint x={closest.x} y={matchedPoints.all[closest.x - 1].y}  innerClass="bg-flash-palette-3 shadow-palette-3"/>
             <div class="annotation bg-flash-gray-600 bg-opacity-80 w-80 h-fit flex absolute whitespace-nowrap bottom-4 leading-tight rounded-lg p-2"
                  style="left: max(calc({annotationOffset.x}% - 20rem), 1rem); top: calc(-4rem - 1rem);">
                 <div class="mr-3">
@@ -107,11 +120,11 @@
                 </div>
                 <div class="flex justify-between w-full">
                     <div>
-                        <b class="text-flash-palette-1 font-semibold">{numberWithSpaces(supplyPoints[closest.x - 1].y.toFixed(0))}</b>
+                        <b class="text-flash-palette-1 font-semibold">{numberWithSpaces(supplyPoints.all[closest.x - 1].y.toFixed(0))}</b>
                         <br/>
-                        <b class="text-flash-palette-2 font-semibold">{numberWithSpaces(stakedPoints[closest.x - 1].y.toFixed(0))}</b>
+                        <b class="text-flash-palette-2 font-semibold">{numberWithSpaces(stakedPoints.all[closest.x - 1].y.toFixed(0))}</b>
                         <br/>
-                        <b class="text-flash-palette-3 font-semibold">{numberWithSpaces(matchedPoints[closest.x - 1].y.toFixed(0))}</b>
+                        <b class="text-flash-palette-3 font-semibold">{numberWithSpaces(matchedPoints.all[closest.x - 1].y.toFixed(0))}</b>
                     </div>
                     <div>
                         $FLASH<br/>
@@ -122,7 +135,7 @@
             </div>
         {/if}
 
-        <Quadtree data={sliceToWindow(zeroPoints, windowLength, supplyPoints.length)} bind:closest/>
+        <Quadtree data={zeroPointsSliced} bind:closest/>
     </Chart>
 </div>
 

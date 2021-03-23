@@ -1,9 +1,7 @@
 import {ASAP, LTD, LTOB, LTTB} from "downsample";
 import {precision} from "./protocol";
 
-const maxPoints = 256;
-
-export type ChartPoint = {x: number, y: number};
+export type Point2 = {x: number, y: number};
 export type WindowLength = 'week' | 'month' | 'year' | '5year' | 'all';
 
 export const getWindow = (length: WindowLength, maxLength: number): number => {
@@ -16,55 +14,62 @@ export const getWindow = (length: WindowLength, maxLength: number): number => {
     }
 }
 
-// const downsample = (array: any[], w)
+type LineDataProps = {}
+export class LineData {
+    private _all: Point2[];
+    private _downsampled: Point2[];
+    private _currentDivisor: number;
+    private _maxPoints: number;
 
-export const sliceToWindow = (array: any[], windowLength: WindowLength, maxLength: number) => {
-    // const window = Math.min(getWindow(windowLength, maxLength), array.length);
-    // if (window > maxPoints) {
-    //     console.log('gfeg');
-    //     const divisor = Math.floor(array.length / maxPoints);
-    //     const snippedArray = array.slice(0, maxPoints*divisor);
-    //     const downsampled = LTTB(snippedArray, Math.floor(array.length / divisor));
-    //     const slicedDownsampled = [];
-    //     console.log(window);
-    //     console.log(downsampled.length);
-    //     if (downsampled.length > maxPoints) {
-    //         for (let i = downsampled.length - window; i < downsampled.length; i++) {
-    //             if (downsampled[i] !== undefined) {
-    //                 console.log(i);
-    //                 console.log(downsampled[i]);
-    //                 slicedDownsampled.push(downsampled[i]);
-    //             }
-    //         }
-    //         console.log(slicedDownsampled);
-    //         return slicedDownsampled;
-    //     } else {
-    //         return downsampled;
-    //     }
-    // } else {
-    //     if (windowLength === 'all') return array;
-    //     let sliced = array.slice(0 - window);
-    //     return array.slice(0 - window);
-    // }
-    const window = Math.min(getWindow(windowLength, maxLength), array.length);
-    const sliced = array.slice(0 - window);
-    return sliced.length > maxPoints ? LTTB(sliced, maxPoints) : sliced;
-}
+    get all() {return this._all};
+    get length() {return this._all.length};
+    get maxPoints() {return this._maxPoints};
 
-type ChartLineProps = {}
-export class ChartLine {
-    private _all: ChartPoint[];
-    private _downsampled: ChartPoint[];
-    private _currentDivisor: number = 1;
-
-    constructor(props: ChartLineProps) {
-
+    constructor(props: LineDataProps = {}) {
+        this._all = [];
+        this._downsampled = [];
+        this._currentDivisor = 1;
+        this._maxPoints = 256;
     }
 
-    public addPoint = (point: ChartPoint) => {
-        // // Add point to raw data array
-        // this._all = [...this._all, point];
-        //
+    public sliceToWindow = (windowLength: WindowLength) => {
+        // const window = Math.min(getWindow(windowLength, maxLength), array.length);
+        // if (window > maxPoints) {
+        //     console.log('gfeg');
+        //     const divisor = Math.floor(array.length / maxPoints);
+        //     const snippedArray = array.slice(0, maxPoints*divisor);
+        //     const downsampled = LTTB(snippedArray, Math.floor(array.length / divisor));
+        //     const slicedDownsampled = [];
+        //     console.log(window);
+        //     console.log(downsampled.length);
+        //     if (downsampled.length > maxPoints) {
+        //         for (let i = downsampled.length - window; i < downsampled.length; i++) {
+        //             if (downsampled[i] !== undefined) {
+        //                 console.log(i);
+        //                 console.log(downsampled[i]);
+        //                 slicedDownsampled.push(downsampled[i]);
+        //             }
+        //         }
+        //         console.log(slicedDownsampled);
+        //         return slicedDownsampled;
+        //     } else {
+        //         return downsampled;
+        //     }
+        // } else {
+        //     if (windowLength === 'all') return array;
+        //     let sliced = array.slice(0 - window);
+        //     return array.slice(0 - window);
+        // }
+        const window = Math.min(getWindow(windowLength, this._all.length), this._all.length);
+        const sliced = this._all.slice(0 - window);
+        console.log(sliced);
+        return sliced.length > this._maxPoints ? LTTB(sliced, this._maxPoints) : sliced;
+    }
+
+    public addPoint = (point: Point2) => {
+        // Add point to raw data array
+        this._all = [...this._all, point];
+
         // // Factor to downsample array by, such that it
         // const divisor = Math.floor(this._all.length / maxPoints);
         // if (divisor !== this._currentDivisor) {

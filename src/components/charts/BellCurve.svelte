@@ -7,6 +7,7 @@
     import {randomTrunc} from "../../utils/probability";
     import type {Bounds} from "../../utils/probability";
     import {scale} from "svelte/transition";
+    import type {Point2} from "../../utils/chart";
 
     const xMax = 200;
     const yMax = 1;
@@ -15,7 +16,7 @@
     export let sigma: number = 0;
     export let bounds: Bounds | null;
     export let cdf: (x: number) => number;
-    let gaussianPoints: {x: number, y: number}[] = [];
+    let gaussianPoints: Point2[] = [];
     let xValues = [];
     let zeroPoints = [];
     let closest = undefined;
@@ -29,7 +30,7 @@
         }
     }
 
-    const chartPointsFromSamples = (mu: number, sigma: number, samples: number = 1000): Array<{x: number, y: number}> => {
+    const chartPointsFromSamples = (mu: number, sigma: number, samples: number = 1000): Array<ChartPoint> => {
         const data = [];
         for (let i = 0; i < samples; i++) {
             data.push(randomTrunc({bounds: {lower: 0, upper: 1}, mu, sigma}));
@@ -45,7 +46,7 @@
         }));
     }
 
-    const chartPointsFromPdf = (mu: number, sigma: number): Array<{x: number, y: number}> => {
+    const chartPointsFromPdf = (mu: number, sigma: number): Array<Point2> => {
         const options = {a: 0, b: 1, mu, sigma};
         const gaussianValues: Number[] = pdf(xValues, options);
         const probMax: Number = pdf(mu, options);
@@ -55,7 +56,7 @@
         }));
     }
 
-    const verticalLine = (x: number): Array<{x: number, y: number}> => {
+    const verticalLine = (x: number): Array<Point2> => {
         const scaledX = Math.round(x*xMax);
         return [{x: scaledX, y: 0}, {x: scaledX, y: yMax}];
     }
