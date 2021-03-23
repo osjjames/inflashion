@@ -10,10 +10,12 @@
     import type {WindowLength, Point2} from "../../utils/chart";
     import {getWindow, LineData} from "../../utils/chart";
 
-    let supplyPoints: LineData = new LineData();
-    let stakedPoints: LineData = new LineData();
-    let matchedPoints: LineData = new LineData();
-    let zeroPoints: LineData = new LineData();
+    let windowLength: WindowLength = 'year';
+
+    let supplyPoints: LineData = new LineData({initialWindow: windowLength});
+    let stakedPoints: LineData = new LineData({initialWindow: windowLength});
+    let matchedPoints: LineData = new LineData({initialWindow: windowLength});
+    let zeroPoints: LineData = new LineData({initialWindow: windowLength});
 
     let supplyPointsSliced: Point2[] = [];
     let stakedPointsSliced: Point2[] = [];
@@ -26,8 +28,6 @@
     let yMax: number = -Infinity;
     let closest = undefined;
     let annotationOffset: Point2 = {x: 0, y: 0};
-
-    let windowLength: WindowLength = 'year';
 
 
     $: sim = $simulation;

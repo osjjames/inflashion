@@ -1,4 +1,4 @@
-import {ASAP, LTD, LTOB, LTTB} from "downsample";
+import {ASAP, LTD, LTOB, LTTB, XYDataPoint} from "downsample";
 import {precision} from "./protocol";
 
 export type Point2 = {x: number, y: number};
@@ -14,25 +14,43 @@ export const getWindow = (length: WindowLength, maxLength: number): number => {
     }
 }
 
-type LineDataProps = {}
+type LineDataProps = {
+    initialWindow: WindowLength
+}
 export class LineData {
     private _all: Point2[];
     private _downsampled: Point2[];
-    private _currentDivisor: number;
-    private _maxPoints: number;
+    private _currentWindow: WindowLength;
+    private _downsampleFactor: number;
+    private readonly _maxPoints: number;
 
     get all() {return this._all};
     get length() {return this._all.length};
     get maxPoints() {return this._maxPoints};
 
-    constructor(props: LineDataProps = {}) {
+    constructor(props: LineDataProps) {
         this._all = [];
         this._downsampled = [];
-        this._currentDivisor = 1;
+        this._downsampleFactor = 1;
+        this._currentWindow = props.initialWindow;
         this._maxPoints = 256;
     }
 
-    public sliceToWindow = (windowLength: WindowLength) => {
+    private downsample = (factor: number) => {
+        // Get the array with the remainder chopped off
+        const remainder = this._all.length % factor;
+        const truncatedAll = this._all.slice(0, this._all.length - remainder);
+
+        const downsampledIndexable = LTTB(truncatedAll, Math.floor(truncatedAll.length / factor));
+        let downsampled: Point2[] = [];
+        for (let i = 0; i < downsampledIndexable.length; i++) {
+            let point = downsampledIndexable[i] as Point2;
+            downsampled.push(point);
+        }
+        return downsampled;
+    }
+
+    public sliceToWindow = (window: WindowLength) => {
         // const window = Math.min(getWindow(windowLength, maxLength), array.length);
         // if (window > maxPoints) {
         //     console.log('gfeg');
@@ -60,15 +78,46 @@ export class LineData {
         //     let sliced = array.slice(0 - window);
         //     return array.slice(0 - window);
         // }
-        const window = Math.min(getWindow(windowLength, this._all.length), this._all.length);
-        const sliced = this._all.slice(0 - window);
-        console.log(sliced);
-        return sliced.length > this._maxPoints ? LTTB(sliced, this._maxPoints) : sliced;
+
+        const windowLength = Math.min(getWindow(window, this._all.length), this._all.length);
+        if (window === 'all') {
+            // Window length is constantly growing, so check if we need to downsample again
+            // Calculate the integer factor we need to downsample by (i.e. 1 downsampled point for every n points)
+            const factor = Math.ceil(windowLength / this._maxPoints);
+            if (factor !== this._downsampleFactor) {
+                this._downsampleFactor = factor;
+                this._downsampled = this.downsample(factor);
+            }
+        }
+
+        if (window !== this._currentWindow) {
+            this._currentWindow = window;
+
+            if (this._maxPoints > windowLength) {
+                this._downsampleFactor = 1;
+                this._downsampled = [...this._all];
+            } else {
+                // Calculate the integer factor we need to downsample by (i.e. 1 downsampled point for every n points)
+                const factor = Math.ceil(windowLength / this._maxPoints);
+                this._downsampleFactor = factor;
+                this._downsampled = this.downsample(factor);
+            }
+        }
+
+        console.log(windowLength);
+
+        return this._downsampled.slice(0 - windowLength);
     }
 
     public addPoint = (point: Point2) => {
         // Add point to raw data array
         this._all = [...this._all, point];
+
+        if (this._all.length % this._downsampleFactor === 0) {
+            // We have enough data to add a new point to our downsampled array
+            const newPoint = LTTB(this._all.slice(0-this._downsampleFactor), 1);
+            this._downsampled = [...this._downsampled, newPoint[0] as Point2];
+        }
 
         // // Factor to downsample array by, such that it
         // const divisor = Math.floor(this._all.length / maxPoints);
