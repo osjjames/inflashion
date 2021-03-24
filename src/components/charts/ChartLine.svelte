@@ -1,7 +1,8 @@
 <script lang="ts">
     import {Svg, SvgLine} from '@sveltejs/pancake';
+    import type {Point2} from "../../utils/chart";
 
-    export let data: {x: number, y: number}[];
+    export let data: Point2[];
     export let pathClass: string = '';
 </script>
 
