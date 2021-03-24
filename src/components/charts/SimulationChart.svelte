@@ -2,6 +2,7 @@
     import {Chart, Grid, Quadtree} from '@sveltejs/pancake';
     import {simulation} from "../../store/simulation";
     import {precision} from "../../utils/protocol";
+    import type {Day} from "../../utils/protocol";
     import {probRound} from "../../utils/probability";
     import {numberWithSpaces, abbreviateNumber} from "../../utils/format";
     import ChartPoint from "./ChartPoint.svelte";
@@ -27,7 +28,7 @@
     let yMin: number = 0;
     let yMax: number = -Infinity;
     let closest = undefined;
-    let annotationOffset: Point2 = {x: 0, y: 0};
+    let annotationOffset: Point2;
 
 
     $: sim = $simulation;
@@ -36,34 +37,43 @@
         return [{x: day, y: 0}, {x: day, y: yMax}];
     }
 
-    $: {
+    const updateChartBounds = () => {
+        xMax = sim.today;
+        xMin = Math.max(sim.today - getWindow(windowLength, supplyPoints.length), 0) + 1;
+        yMax = probRound(Math.max(...(supplyPoints.sliceToWindow(windowLength).map(p => p.y))), 1, 'CEIL');
+    }
+
+    const updateChartWithNewDay = (day: Day) => {
         supplyPoints.addPoint({
-            x: sim.today,
+            x: day,
             y: sim.protocol.totalSupply / precision
         });
         stakedPoints.addPoint({
-            x: sim.today,
+            x: day,
             y: sim.protocol.totalStaked / precision
         });
         matchedPoints.addPoint({
-            x: sim.today,
+            x: day,
             y: sim.protocol.totalMatched / precision
         });
-        zeroPoints.addPoint({
-            x: sim.today,
-            y: 0
-        });
 
-        xMax = sim.today;
-        xMin = Math.max(sim.today - getWindow(windowLength, supplyPoints.length), 0);
-        yMax = yMax = probRound(Math.max(...(supplyPoints.sliceToWindow(windowLength).map(p => p.y))), 1, 'CEIL');
-
+        updateChartBounds();
+        updateSlicedLines();
+    }
+    const updateSlicedLines = () => {
         supplyPointsSliced = supplyPoints.sliceToWindow(windowLength);
         stakedPointsSliced = stakedPoints.sliceToWindow(windowLength);
         matchedPointsSliced = matchedPoints.sliceToWindow(windowLength);
-        zeroPointsSliced = zeroPoints.sliceToWindow(windowLength);
+        zeroPointsSliced = supplyPointsSliced.map(p => ({x: p.x, y: 0}));
     }
 
+    const updateChartWithNewWindow = (windowLength: WindowLength) => {
+        updateChartBounds();
+        updateSlicedLines();
+    }
+
+    $: updateChartWithNewDay(sim.today);
+    $: updateChartWithNewWindow(windowLength);
     $: if (closest) {
         let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
         annotationOffset = {

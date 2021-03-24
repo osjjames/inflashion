@@ -1,6 +1,4 @@
-import {ASAP, LTD, LTOB, LTTB, XYDataPoint} from "downsample";
-import {precision} from "./protocol";
-import {probRound} from "./probability";
+import {LTTB} from "downsample";
 
 export type Point2 = {x: number, y: number};
 export type WindowLength = 'week' | 'month' | 'year' | '5year' | 'all';
@@ -34,7 +32,7 @@ export class LineData {
         this._downsampled = [];
         this._downsampleFactor = 1;
         this._currentWindow = props.initialWindow;
-        this._maxPoints = 256;
+        this._maxPoints = 512;
     }
 
     private downsample = (factor: number) => {
@@ -57,7 +55,7 @@ export class LineData {
     public sliceToWindow = (window: WindowLength) => {
         const windowLength = Math.min(getWindow(window, this._all.length), this._all.length);
 
-        if (this._maxPoints > windowLength) {
+        if (this._maxPoints >= windowLength) {
             this._downsampleFactor = 1;
             this._downsampled = [...this._all];
         } else {
@@ -69,7 +67,9 @@ export class LineData {
             }
         }
 
-        return this._downsampled.slice(0 - Math.floor(windowLength / this._downsampleFactor));
+        return this._downsampleFactor === 1
+            ? this._all.slice(0 - windowLength)
+            : this._downsampled.slice(0 - Math.floor(windowLength / this._downsampleFactor));
     }
 
     public addPoint = (point: Point2) => {
