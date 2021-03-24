@@ -39,11 +39,13 @@ export class Simulation {
     private _agents: Array<Agent>;
     private _protocol: Protocol;
     private _today: Day;
+    private _history: Protocol[];
 
     constructor(props: SimulationProps) {
         this._agents = initialiseAgents(props.population, props.totalSupply);
         this._protocol = new Protocol({totalSupply: props.totalSupply});
         this._today = props.initialDay;
+        this._history = [];
     }
 
     get agents() {return this._agents}
@@ -58,6 +60,7 @@ export class Simulation {
             }
         }
         this._today += 1;
+        this._history = [...this._history, this._protocol];
         return this;
     }
 }
