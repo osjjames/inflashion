@@ -10,6 +10,7 @@
     import ButtonSmall from "../input/ButtonSmall.svelte";
     import type {WindowLength, Point2} from "../../utils/chart";
     import {getWindow, LineData} from "../../utils/chart";
+    import ChartToggle from "../input/ChartToggle.svelte";
 
     let windowLength: WindowLength = 'year';
     type LineNames = 'supply' | 'staked' | 'matched';
@@ -48,10 +49,10 @@
 
         const allVisibleY =
             Object.keys(lines)
-            .filter(lineName => !lines[lineName].hidden)   // Filter out hidden lines
-            .map(lineName => slicedLines[lineName]) // Slice all to the current window
-            .reduce((acc, val) => acc.concat(val), []) // Flatten into single array of all points
-            .map(point => point.y); // Extract y values from points
+                .filter(lineName => !lines[lineName].hidden)   // Filter out hidden lines
+                .map(lineName => slicedLines[lineName]) // Slice all to the current window
+                .reduce((acc, val) => acc.concat(val), []) // Flatten into single array of all points
+                .map(point => point.y); // Extract y values from points
 
         yMin = probRound(Math.min(...allVisibleY), 1, 'FLOOR');
         yMax = probRound(Math.max(...allVisibleY), 1, 'CEIL');
@@ -109,8 +110,13 @@
 <div class="w-full h-96 p-12 pt-0 flex flex-col">
     <div class="flex justify-between mb-4">
         <div class="flex">
-            {#each Object.keys(lines) as lineName (lineName)}
-                <ButtonSmall onClick={() => lines[lineName].hidden = !lines[lineName].hidden} selected={!lines[lineName].hidden}>{lines[lineName].name}</ButtonSmall>
+            {#each Object.keys(lines) as lineName, index (lineName)}
+                <ChartToggle
+                        onClick={() => lines[lineName].hidden = !lines[lineName].hidden}
+                        active={!lines[lineName].hidden}
+                        activeClass="bg-flash-palette-{index+1} shadow-palette-{index+1}">
+                    {lines[lineName].name}
+                </ChartToggle>
             {/each}
         </div>
         <div class="flex">
