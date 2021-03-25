@@ -11,6 +11,9 @@
     import type {WindowLength, Point2} from "../../utils/chart";
     import {getWindow, LineData} from "../../utils/chart";
     import ChartToggle from "../input/ChartToggle.svelte";
+    import { fade } from 'svelte/transition';
+    import {tweened} from "svelte/motion";
+    import {cubicInOut} from "svelte/easing";
 
     let windowLength: WindowLength = 'year';
     type LineNames = 'supply' | 'staked' | 'matched';
@@ -32,20 +35,30 @@
 
     $: sim = $simulation;
 
-    let xMin = 0;
-    let xMax = 1;
-    let yMin: number = 0;
-    let yMax: number = -Infinity;
+    const xMin = tweened<number>(0, {
+        duration: 100
+    });
+    const xMax = tweened<number>(1, {
+        duration: 100
+    });
+    const yMin = tweened<number>(0, {
+        duration: 100,
+        easing: cubicInOut
+    });
+    const yMax = tweened<number>(-Infinity, {
+        duration: 100,
+        easing: cubicInOut
+    });
     let closest = undefined;
     let annotationOffset: Point2;
 
     const verticalLine = (day: number): Array<Point2> => {
-        return [{x: day, y: yMin}, {x: day, y: yMax}];
+        return [{x: day, y: $yMin as number}, {x: day, y: $yMax as number}];
     }
 
     const updateChartBounds = (linesHidden: LinesType<boolean>) => {
-        xMax = sim.today;
-        xMin = Math.max(sim.today - getWindow(windowLength, sim.today), 0) + 1;
+        $xMax = sim.today;
+        xMin.update(n => Math.max(sim.today - getWindow(windowLength, sim.today), 0) + 1);
 
         const allVisibleY =
             Object.keys(lines)
@@ -54,8 +67,8 @@
                 .reduce((acc, val) => acc.concat(val), []) // Flatten into single array of all points
                 .map(point => point.y); // Extract y values from points
 
-        yMin = probRound(Math.min(...allVisibleY), 1, 'FLOOR');
-        yMax = probRound(Math.max(...allVisibleY), 1, 'CEIL');
+        yMin.update(n => probRound(Math.min(...allVisibleY), 1, 'FLOOR'));
+        yMax.update(n => probRound(Math.max(...allVisibleY), 1, 'CEIL'));
     }
 
     const updateChartWithNewDay = (day: Day) => {
@@ -97,7 +110,7 @@
     $: updateChartWithNewWindow(windowLength);
     $: updateChartBounds(linesHidden);
     $: if (closest) {
-        let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
+        let xPercent = -(100 * (($xMax - closest.x) / ($xMax - $xMin))) + 100;
         annotationOffset = {
             x: xPercent,
             y: 0
@@ -126,7 +139,7 @@
             <ButtonSmall onClick={() => windowLength = 'all'} selected={windowLength === 'all'}>ALL</ButtonSmall>
         </div>
     </div>
-    <Chart x1={xMin} x2={xMax} y1={yMin} y2={yMax} class="relative cursor-crosshair">
+    <Chart x1={$xMin} x2={$xMax} y1={$yMin} y2={$yMax} class="relative cursor-crosshair">
         <Grid horizontal count={5} let:value>
             <div class="relative block border-b text-right border-flash-gray-300 opacity-80 border-dashed w-full">
                 <span class="absolute bottom-0.25 -left-24 pr-2 w-24 transform -translate-y-3">{abbreviateNumber(value)}</span>
