@@ -74,7 +74,14 @@ export class LineData {
 
         return this._downsampleFactor === 1
             ? this._all.slice(0 - windowLength)
-            : this._downsampled.slice(0 - Math.floor(windowLength / this._downsampleFactor));
+            : this.appendLatestPoints(this._downsampled.slice(0 - Math.floor(windowLength / this._downsampleFactor)));
+    }
+
+    private appendLatestPoints = (slicedDownsampled: Point2[]) => {
+        const pointsToAppend = this._all[this._all.length - 1].x - slicedDownsampled[slicedDownsampled.length - 1].x;
+
+        if (pointsToAppend === 0) return slicedDownsampled;
+        return [...slicedDownsampled, ...this._all.slice(0 - pointsToAppend)];
     }
 
     public addPoint = (point: Point2) => {
