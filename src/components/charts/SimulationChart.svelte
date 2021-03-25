@@ -109,9 +109,9 @@
 <div class="w-full h-96 p-12 pt-0 flex flex-col">
     <div class="flex justify-between mb-4">
         <div class="flex">
-            <ButtonSmall onClick={() => lines.supply.hidden = !lines.supply.hidden} selected={!lines.supply.hidden}>{lines.supply.name}</ButtonSmall>
-            <ButtonSmall onClick={() => lines.staked.hidden = !lines.staked.hidden} selected={!lines.staked.hidden}>{lines.staked.name}</ButtonSmall>
-            <ButtonSmall onClick={() => lines.matched.hidden = !lines.matched.hidden} selected={!lines.matched.hidden}>{lines.matched.name}</ButtonSmall>
+            {#each Object.keys(lines) as lineName (lineName)}
+                <ButtonSmall onClick={() => lines[lineName].hidden = !lines[lineName].hidden} selected={!lines[lineName].hidden}>{lines[lineName].name}</ButtonSmall>
+            {/each}
         </div>
         <div class="flex">
             <ButtonSmall onClick={() => windowLength = 'month'} selected={windowLength === 'month'}>1M</ButtonSmall>
@@ -131,21 +131,19 @@
             <span class="x-label">{numberWithSpaces(value)}</span>
         </Grid>
 
-        {#if slicedLines.supply.length > 1 && !linesHidden.supply}
-            <ChartLine data={slicedLines.supply} pathClass="stroke-palette-1"/>
-        {/if}
-        {#if slicedLines.staked.length > 1 && !linesHidden.staked}
-            <ChartLine data={slicedLines.staked} pathClass="stroke-palette-2"/>
-        {/if}
-        {#if slicedLines.matched.length > 1 && !linesHidden.matched}
-            <ChartLine data={slicedLines.matched} pathClass="stroke-palette-3"/>
-        {/if}
+        {#each Object.keys(lines) as lineName, index (lineName)}
+            {#if slicedLines[lineName].length > 1 && !linesHidden[lineName]}
+                <ChartLine data={slicedLines[lineName]} pathClass="stroke-palette-{index+1}"/>
+            {/if}
+        {/each}
 
         {#if closest && sim.today > 1}
             <ChartLine data={verticalLine(closest.x)} pathClass="stroke-2 stroke-gray"/>
-            {#if !linesHidden.supply}<ChartPoint x={closest.x} y={lines.supply.all[closest.x - 1].y} innerClass="bg-flash-palette-1 shadow-palette-1"/>{/if}
-            {#if !linesHidden.staked}<ChartPoint x={closest.x} y={lines.staked.all[closest.x - 1].y} innerClass="bg-flash-palette-2 shadow-palette-2"/>{/if}
-            {#if !linesHidden.matched}<ChartPoint x={closest.x} y={lines.matched.all[closest.x - 1].y}  innerClass="bg-flash-palette-3 shadow-palette-3"/>{/if}
+            {#each Object.keys(lines) as lineName, index (lineName)}
+                {#if !linesHidden[lineName]}
+                    <ChartPoint x={closest.x} y={lines[lineName].all[closest.x - 1].y} innerClass="bg-flash-palette-{index+1} shadow-palette-{index+1}"/>
+                {/if}
+            {/each}
             <div class="annotation bg-flash-gray-600 bg-opacity-80 w-80 h-fit flex absolute whitespace-nowrap bottom-4 leading-tight rounded-lg p-2"
                  style="left: max(calc({annotationOffset.x}% - 20rem), 1rem); top: calc(-4rem - 1rem);">
                 <div class="mr-3">
@@ -155,17 +153,17 @@
                 </div>
                 <div class="flex justify-between w-full">
                     <div>
-                        {#each Object.keys(lines) as lineName (lineName)}
-                        {#if !linesHidden.supply}<b class="text-flash-palette-1 font-semibold">{numberWithSpaces(lines.supply.all[closest.x - 1].y.toFixed(0))}</b>
-                        <br/>{/if}
-                        {#if !linesHidden.staked}<b class="text-flash-palette-2 font-semibold">{numberWithSpaces(lines.staked.all[closest.x - 1].y.toFixed(0))}</b>
-                        <br/>{/if}
-                        {#if !linesHidden.matched}<b class="text-flash-palette-3 font-semibold">{numberWithSpaces(lines.matched.all[closest.x - 1].y.toFixed(0))}</b>{/if}
+                        {#each Object.keys(lines) as lineName, index (lineName)}
+                            {#if !linesHidden[lineName]}
+                                <b class="text-flash-palette-{index+1} font-semibold">{numberWithSpaces(lines[lineName].all[closest.x - 1].y.toFixed(0))}</b>
+                                <br/>
+                            {/if}
+                        {/each}
                     </div>
                     <div>
-                        {#if !linesHidden.supply}$FLASH<br/>{/if}
-                        {#if !linesHidden.staked}$FLASH<br/>{/if}
-                        {#if !linesHidden.matched}$FLASH{/if}
+                        {#each Object.keys(lines) as lineName (lineName)}
+                            {#if !linesHidden[lineName]}$FLASH<br/>{/if}
+                        {/each}
                     </div>
                 </div>
             </div>
