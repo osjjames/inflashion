@@ -12,68 +12,89 @@
     import {getWindow, LineData} from "../../utils/chart";
 
     let windowLength: WindowLength = 'year';
+    type LineNames = 'supply' | 'staked' | 'matched';
+    type LinesType<T> = {
+        [name in LineNames]: T
+    }
 
-    let supplyPoints: LineData = new LineData({initialWindow: windowLength});
-    let stakedPoints: LineData = new LineData({initialWindow: windowLength});
-    let matchedPoints: LineData = new LineData({initialWindow: windowLength});
-    let zeroPoints: LineData = new LineData({initialWindow: windowLength});
+    let lines: LinesType<LineData> = {
+        supply: new LineData({name: 'Total Supply'}),
+        staked: new LineData({name: 'Total Staked'}),
+        matched: new LineData({name: 'Total Matched'})
+    };
+    let slicedLines: LinesType<Point2[]> = {
+        supply: [],
+        staked: [],
+        matched: []
+    };
+    let zeroSliced = [];
 
-    let supplyPointsSliced: Point2[] = [];
-    let stakedPointsSliced: Point2[] = [];
-    let matchedPointsSliced: Point2[] = [];
-    let zeroPointsSliced: Point2[] = [];
+    $: sim = $simulation;
 
     let xMin = 0;
-    let xMax = supplyPoints.length;
+    let xMax = 1;
     let yMin: number = 0;
     let yMax: number = -Infinity;
     let closest = undefined;
     let annotationOffset: Point2;
 
-
-    $: sim = $simulation;
-
     const verticalLine = (day: number): Array<Point2> => {
-        return [{x: day, y: 0}, {x: day, y: yMax}];
+        return [{x: day, y: yMin}, {x: day, y: yMax}];
     }
 
-    const updateChartBounds = () => {
+    const updateChartBounds = (linesHidden: LinesType<boolean>) => {
         xMax = sim.today;
-        xMin = Math.max(sim.today - getWindow(windowLength, supplyPoints.length), 0) + 1;
-        yMax = probRound(Math.max(...(supplyPoints.sliceToWindow(windowLength).map(p => p.y))), 1, 'CEIL');
+        xMin = Math.max(sim.today - getWindow(windowLength, sim.today), 0) + 1;
+
+        const allVisibleY =
+            Object.keys(lines)
+            .filter(lineName => !lines[lineName].hidden)   // Filter out hidden lines
+            .map(lineName => slicedLines[lineName]) // Slice all to the current window
+            .reduce((acc, val) => acc.concat(val), []) // Flatten into single array of all points
+            .map(point => point.y); // Extract y values from points
+
+        yMin = probRound(Math.min(...allVisibleY), 1, 'FLOOR');
+        yMax = probRound(Math.max(...allVisibleY), 1, 'CEIL');
     }
 
     const updateChartWithNewDay = (day: Day) => {
-        supplyPoints.addPoint({
+        lines.supply.addPoint({
             x: day,
             y: sim.protocol.totalSupply / precision
         });
-        stakedPoints.addPoint({
+        lines.staked.addPoint({
             x: day,
             y: sim.protocol.totalStaked / precision
         });
-        matchedPoints.addPoint({
+        lines.matched.addPoint({
             x: day,
             y: sim.protocol.totalMatched / precision
         });
 
-        updateChartBounds();
         updateSlicedLines();
+        updateChartBounds(linesHidden);
     }
     const updateSlicedLines = () => {
-        supplyPointsSliced = supplyPoints.sliceToWindow(windowLength);
-        stakedPointsSliced = stakedPoints.sliceToWindow(windowLength);
-        matchedPointsSliced = matchedPoints.sliceToWindow(windowLength);
-        zeroPointsSliced = supplyPointsSliced.map(p => ({x: p.x, y: 0}));
+        slicedLines.supply = lines.supply.sliceToWindow(windowLength);
+        slicedLines.staked = lines.staked.sliceToWindow(windowLength);
+        slicedLines.matched = lines.matched.sliceToWindow(windowLength);
+        zeroSliced = slicedLines.supply.map(p => ({x: p.x, y: 0}));
     }
 
     const updateChartWithNewWindow = (windowLength: WindowLength) => {
-        updateChartBounds();
         updateSlicedLines();
+        updateChartBounds(linesHidden);
+    }
+
+    $: linesHidden = {
+        supply: lines.supply.hidden,
+        staked: lines.staked.hidden,
+        matched: lines.matched.hidden
     }
 
     $: updateChartWithNewDay(sim.today);
     $: updateChartWithNewWindow(windowLength);
+    $: updateChartBounds(linesHidden);
     $: if (closest) {
         let xPercent = -(100 * ((xMax - closest.x) / (xMax - xMin))) + 100;
         annotationOffset = {
@@ -86,9 +107,13 @@
 </script>
 
 <div class="w-full h-96 p-12 pt-0 flex flex-col">
-    <div class="flex justify-end">
-        <div class="flex mb-4">
-            <ButtonSmall onClick={() => windowLength = 'week'} selected={windowLength === 'week'}>1W</ButtonSmall>
+    <div class="flex justify-between mb-4">
+        <div class="flex">
+            <ButtonSmall onClick={() => lines.supply.hidden = !lines.supply.hidden} selected={!lines.supply.hidden}>{lines.supply.name}</ButtonSmall>
+            <ButtonSmall onClick={() => lines.staked.hidden = !lines.staked.hidden} selected={!lines.staked.hidden}>{lines.staked.name}</ButtonSmall>
+            <ButtonSmall onClick={() => lines.matched.hidden = !lines.matched.hidden} selected={!lines.matched.hidden}>{lines.matched.name}</ButtonSmall>
+        </div>
+        <div class="flex">
             <ButtonSmall onClick={() => windowLength = 'month'} selected={windowLength === 'month'}>1M</ButtonSmall>
             <ButtonSmall onClick={() => windowLength = 'year'} selected={windowLength === 'year'}>1Y</ButtonSmall>
             <ButtonSmall onClick={() => windowLength = '5year'} selected={windowLength === '5year'}>5Y</ButtonSmall>
@@ -106,46 +131,47 @@
             <span class="x-label">{numberWithSpaces(value)}</span>
         </Grid>
 
-        {#if supplyPointsSliced.length > 1}
-            <ChartLine data={supplyPointsSliced} pathClass="stroke-palette-1"/>
+        {#if slicedLines.supply.length > 1 && !linesHidden.supply}
+            <ChartLine data={slicedLines.supply} pathClass="stroke-palette-1"/>
         {/if}
-        {#if stakedPointsSliced.length > 1}
-            <ChartLine data={stakedPointsSliced} pathClass="stroke-palette-2"/>
+        {#if slicedLines.staked.length > 1 && !linesHidden.staked}
+            <ChartLine data={slicedLines.staked} pathClass="stroke-palette-2"/>
         {/if}
-        {#if matchedPointsSliced.length > 1}
-            <ChartLine data={matchedPointsSliced} pathClass="stroke-palette-3"/>
+        {#if slicedLines.matched.length > 1 && !linesHidden.matched}
+            <ChartLine data={slicedLines.matched} pathClass="stroke-palette-3"/>
         {/if}
 
-        {#if closest && supplyPoints.length > 1}
+        {#if closest && sim.today > 1}
             <ChartLine data={verticalLine(closest.x)} pathClass="stroke-2 stroke-gray"/>
-            <ChartPoint x={closest.x} y={supplyPoints.all[closest.x - 1].y} innerClass="bg-flash-palette-1 shadow-palette-1"/>
-            <ChartPoint x={closest.x} y={stakedPoints.all[closest.x - 1].y} innerClass="bg-flash-palette-2 shadow-palette-2"/>
-            <ChartPoint x={closest.x} y={matchedPoints.all[closest.x - 1].y}  innerClass="bg-flash-palette-3 shadow-palette-3"/>
+            {#if !linesHidden.supply}<ChartPoint x={closest.x} y={lines.supply.all[closest.x - 1].y} innerClass="bg-flash-palette-1 shadow-palette-1"/>{/if}
+            {#if !linesHidden.staked}<ChartPoint x={closest.x} y={lines.staked.all[closest.x - 1].y} innerClass="bg-flash-palette-2 shadow-palette-2"/>{/if}
+            {#if !linesHidden.matched}<ChartPoint x={closest.x} y={lines.matched.all[closest.x - 1].y}  innerClass="bg-flash-palette-3 shadow-palette-3"/>{/if}
             <div class="annotation bg-flash-gray-600 bg-opacity-80 w-80 h-fit flex absolute whitespace-nowrap bottom-4 leading-tight rounded-lg p-2"
                  style="left: max(calc({annotationOffset.x}% - 20rem), 1rem); top: calc(-4rem - 1rem);">
                 <div class="mr-3">
-                    Total Supply:<br/>
-                    Total Staked:<br/>
-                    Total Matched:
+                    {#each Object.keys(lines) as lineName (lineName)}
+                        {#if !linesHidden[lineName]}{lines[lineName].name}:<br/>{/if}
+                    {/each}
                 </div>
                 <div class="flex justify-between w-full">
                     <div>
-                        <b class="text-flash-palette-1 font-semibold">{numberWithSpaces(supplyPoints.all[closest.x - 1].y.toFixed(0))}</b>
-                        <br/>
-                        <b class="text-flash-palette-2 font-semibold">{numberWithSpaces(stakedPoints.all[closest.x - 1].y.toFixed(0))}</b>
-                        <br/>
-                        <b class="text-flash-palette-3 font-semibold">{numberWithSpaces(matchedPoints.all[closest.x - 1].y.toFixed(0))}</b>
+                        {#each Object.keys(lines) as lineName (lineName)}
+                        {#if !linesHidden.supply}<b class="text-flash-palette-1 font-semibold">{numberWithSpaces(lines.supply.all[closest.x - 1].y.toFixed(0))}</b>
+                        <br/>{/if}
+                        {#if !linesHidden.staked}<b class="text-flash-palette-2 font-semibold">{numberWithSpaces(lines.staked.all[closest.x - 1].y.toFixed(0))}</b>
+                        <br/>{/if}
+                        {#if !linesHidden.matched}<b class="text-flash-palette-3 font-semibold">{numberWithSpaces(lines.matched.all[closest.x - 1].y.toFixed(0))}</b>{/if}
                     </div>
                     <div>
-                        $FLASH<br/>
-                        $FLASH<br/>
-                        $FLASH
+                        {#if !linesHidden.supply}$FLASH<br/>{/if}
+                        {#if !linesHidden.staked}$FLASH<br/>{/if}
+                        {#if !linesHidden.matched}$FLASH{/if}
                     </div>
                 </div>
             </div>
         {/if}
 
-        <Quadtree data={zeroPointsSliced} bind:closest/>
+        <Quadtree data={zeroSliced} bind:closest/>
     </Chart>
 </div>
 

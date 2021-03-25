@@ -5,7 +5,6 @@ export type WindowLength = 'week' | 'month' | 'year' | '5year' | 'all';
 
 export const getWindow = (length: WindowLength, maxLength: number): number => {
     switch (length) {
-        case 'week': return 7;
         case 'month': return 30;
         case 'year': return 365;
         case '5year': return 1825;
@@ -14,24 +13,30 @@ export const getWindow = (length: WindowLength, maxLength: number): number => {
 }
 
 type LineDataProps = {
-    initialWindow: WindowLength
+    name: string
 }
 export class LineData {
+    private _name: string;
+    private _hidden: boolean;
     private _all: Point2[];
     private _downsampled: Point2[];
-    private _currentWindow: WindowLength;
     private _downsampleFactor: number;
     private readonly _maxPoints: number;
 
+    get name() {return this._name};
+    get hidden() {return this._hidden};
     get all() {return this._all};
     get length() {return this._all.length};
     get maxPoints() {return this._maxPoints};
 
+    set hidden(hidden: boolean) {this._hidden = hidden};
+
     constructor(props: LineDataProps) {
+        this._name = props.name;
+        this._hidden = false;
         this._all = [];
         this._downsampled = [];
         this._downsampleFactor = 1;
-        this._currentWindow = props.initialWindow;
         this._maxPoints = 512;
     }
 
