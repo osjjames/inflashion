@@ -14,6 +14,7 @@
     import { fade } from 'svelte/transition';
     import {tweened} from "svelte/motion";
     import {cubicInOut} from "svelte/easing";
+    import {speed} from "../../store/time";
 
     let windowLength: WindowLength = 'year';
     type LineNames = 'supply' | 'staked' | 'matched';
@@ -36,10 +37,10 @@
     $: sim = $simulation;
 
     const xMin = tweened<number>(0, {
-        duration: 100
+        duration: 50
     });
     const xMax = tweened<number>(1, {
-        duration: 100
+        duration: 50
     });
     const yMin = tweened<number>(0, {
         duration: 100,
@@ -56,9 +57,18 @@
         return [{x: day, y: $yMin as number}, {x: day, y: $yMax as number}];
     }
 
+    const getTransitionSpeed = (speed: number) => {
+        const interval = Math.floor(1000/speed);
+        return interval < 50 ? 0 : Math.floor(interval / 2);
+    }
+
     const updateChartBounds = (linesHidden: LinesType<boolean>) => {
-        $xMax = sim.today;
-        xMin.update(n => Math.max(sim.today - getWindow(windowLength, sim.today), 0) + 1);
+        const interval = Math.floor(1000/$speed);
+        const xTransitionSpeed = $speed > 20 ? 0 : Math.floor(interval / 2);
+        const yTransitionSpeed = $speed < 10 ? 100 : Math.floor((interval/3) + (100 * 2/3));
+
+        xMax.update(n => sim.today, {duration: xTransitionSpeed});
+        xMin.update(n => Math.max(sim.today - getWindow(windowLength, sim.today), 0) + 1, {duration: xTransitionSpeed});
 
         const allVisibleY =
             Object.keys(lines)
@@ -67,8 +77,8 @@
                 .reduce((acc, val) => acc.concat(val), []) // Flatten into single array of all points
                 .map(point => point.y); // Extract y values from points
 
-        yMin.update(n => probRound(Math.min(...allVisibleY), 1, 'FLOOR'));
-        yMax.update(n => probRound(Math.max(...allVisibleY), 1, 'CEIL'));
+        yMin.update(n => probRound(Math.min(...allVisibleY), 1, 'FLOOR'), {duration: yTransitionSpeed});
+        yMax.update(n => probRound(Math.max(...allVisibleY), 1, 'CEIL'), {duration: yTransitionSpeed});
     }
 
     const updateChartWithNewDay = (day: Day) => {

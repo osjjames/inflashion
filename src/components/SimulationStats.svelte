@@ -1,5 +1,6 @@
 <script lang="ts">
     import {simulation, fpyMatch} from "../store/simulation";
+    import {speed} from "../store/time";
     import {IntervalTimer} from "../utils/interval";
     import type {IntervalTimerState} from "../utils/interval";
     import moment from "moment";
@@ -14,7 +15,6 @@
 
     let timer: IntervalTimer;
     let buttonText: string = 'Start';
-    let dps: number = 2;
     let lastIntervalStart;
     let actualSpeed;
 
@@ -70,7 +70,7 @@
         });
     });
 
-    $: intervalMs = 1000/dps;
+    $: intervalMs = 1000/$speed;
     $: timer?.setInterval(intervalMs);
 </script>
 
@@ -84,10 +84,10 @@
     </SimulationStatCell>
     <SimulationStatCell name="Speed">
         <div>
-            <span class="text-xl">{dps.toFixed(0)}&nbsp;</span>
+            <span class="text-xl">{$speed.toFixed(0)}&nbsp;</span>
             <span class="text-sm">days per second</span>
         </div>
-        <Slider inputClass={`w-36`} min="2" max="100" step="2" bind:value={dps}></Slider>
+        <Slider inputClass={`w-36`} min="2" max="100" step="2" bind:value={$speed}></Slider>
         {#if actualSpeed}
             <span class="text-sm text-flash-gray-100">Actual: {actualSpeed}</span>
         {/if}

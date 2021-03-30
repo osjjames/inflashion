@@ -1,13 +1,8 @@
-import { writable } from 'svelte/store';
+import {readable, writable} from 'svelte/store';
 import type {Day} from "../utils/protocol";
 
-function startClock(startDay: Day = 0) {
-    const { subscribe, set, update } = writable(startDay);
-
-    return {
-        subscribe,
-        nextDay: () => update(n => n + 1)
-    };
+function createSpeed(initialDaysPerSecond: number) {
+    return writable(initialDaysPerSecond);
 }
 
-export const currentDay = startClock();
+export const speed = createSpeed(2);
