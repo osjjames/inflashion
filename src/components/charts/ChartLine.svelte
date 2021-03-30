@@ -9,7 +9,7 @@
 
 <Svg>
     <SvgLine {data} let:d>
-        <path class="{pathClass}" {d} in:fade="{{delay: 100, duration: 50}}" out:fade="{{duration: 50}}"></path>
+        <path class="{pathClass}" {d} in:fade="{{duration: 50}}" out:fade="{{duration: 50}}"></path>
     </SvgLine>
 </Svg>
 
