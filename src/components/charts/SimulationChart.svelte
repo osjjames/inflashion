@@ -178,26 +178,29 @@
                     <ChartPoint x={closest.x} y={lines[lineName].all[closest.x - 1].y} innerClass="bg-flash-palette-{index+1} shadow-palette-{index+1}"/>
                 {/if}
             {/each}
-            <div class="annotation bg-flash-gray-600 bg-opacity-80 w-80 h-fit flex absolute whitespace-nowrap bottom-4 leading-tight rounded-lg p-2"
-                 style="left: max(calc({annotationOffset.x}% - 20rem), 1rem); top: calc(-4rem - 1rem);">
-                <div class="mr-3">
-                    {#each Object.keys(lines) as lineName (lineName)}
-                        {#if !linesHidden[lineName]}{lines[lineName].name}:<br/>{/if}
-                    {/each}
-                </div>
-                <div class="flex justify-between w-full">
-                    <div>
-                        {#each Object.keys(lines) as lineName, index (lineName)}
-                            {#if !linesHidden[lineName]}
-                                <b class="text-flash-palette-{index+1} font-semibold">{numberWithSpaces(lines[lineName].all[closest.x - 1].y.toFixed(0))}</b>
-                                <br/>
-                            {/if}
+            <div class="annotation bg-flash-gray-600 bg-opacity-80 w-80 h-fit flex-col absolute whitespace-nowrap bottom-4 leading-tight rounded-lg p-2"
+                 style="left: calc({annotationOffset.x}% - 20rem); top: calc(-4rem - 1rem);">
+                <div class="w-full font-semibold">Day {closest.x}</div>
+                <div class="flex">
+                    <div class="mr-3">
+                        {#each Object.keys(lines) as lineName (lineName)}
+                            {#if !linesHidden[lineName]}{lines[lineName].name}:<br/>{/if}
                         {/each}
                     </div>
-                    <div>
-                        {#each Object.keys(lines) as lineName (lineName)}
-                            {#if !linesHidden[lineName]}$FLASH<br/>{/if}
-                        {/each}
+                    <div class="flex justify-between w-full">
+                        <div>
+                            {#each Object.keys(lines) as lineName, index (lineName)}
+                                {#if !linesHidden[lineName]}
+                                    <b class="text-flash-palette-{index+1} font-semibold">{numberWithSpaces(lines[lineName].all[closest.x - 1].y.toFixed(0))}</b>
+                                    <br/>
+                                {/if}
+                            {/each}
+                        </div>
+                        <div>
+                            {#each Object.keys(lines) as lineName (lineName)}
+                                {#if !linesHidden[lineName]}$FLASH<br/>{/if}
+                            {/each}
+                        </div>
                     </div>
                 </div>
             </div>
