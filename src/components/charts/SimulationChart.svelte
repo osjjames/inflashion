@@ -139,7 +139,8 @@
             <ButtonSmall onClick={() => windowLength = 'all'} selected={windowLength === 'all'}>ALL</ButtonSmall>
         </div>
     </div>
-    <Chart x1={$xMin} x2={$xMax} y1={$yMin} y2={$yMax} class="relative cursor-crosshair">
+    <div class="relative cursor-crosshair w-full h-full">
+    <Chart x1={$xMin} x2={$xMax} y1={$yMin} y2={$yMax}>
         <Grid horizontal count={5} let:value>
             <div class="relative block border-b text-right border-flash-gray-300 opacity-80 border-dashed w-full">
                 <span class="absolute bottom-0.25 -left-24 pr-2 w-24 transform -translate-y-3">{abbreviateNumber(value)}</span>
@@ -150,14 +151,18 @@
             <span class="x-label">{numberWithSpaces(value)}</span>
         </Grid>
 
-        {#each Object.keys(lines) as lineName, index (lineName)}
-            {#if slicedLines[lineName].length > 1 && !linesHidden[lineName]}
-                <ChartLine data={slicedLines[lineName]} pathClass="stroke-palette-{index+1}"/>
+        <div class="line-chart w-full h-full">
+            {#each Object.keys(lines) as lineName, index (lineName)}
+                {#if slicedLines[lineName].length > 1 && !linesHidden[lineName]}
+                    <ChartLine data={slicedLines[lineName]} pathClass="stroke-palette-{index+1}"/>
+                {/if}
+            {/each}
+            {#if closest && sim.today > 1}
+                <ChartLine data={verticalLine(closest.x)} pathClass="stroke-2 stroke-gray"/>
             {/if}
-        {/each}
+        </div>
 
         {#if closest && sim.today > 1}
-            <ChartLine data={verticalLine(closest.x)} pathClass="stroke-2 stroke-gray"/>
             {#each Object.keys(lines) as lineName, index (lineName)}
                 {#if !linesHidden[lineName]}
                     <ChartPoint x={closest.x} y={lines[lineName].all[closest.x - 1].y} innerClass="bg-flash-palette-{index+1} shadow-palette-{index+1}"/>
@@ -190,6 +195,7 @@
 
         <Quadtree data={zeroSliced} bind:closest/>
     </Chart>
+    </div>
 </div>
 
 <style>
@@ -217,5 +223,9 @@
     .annotation span {
         display: block;
         font-size: 14px;
+    }
+
+    .line-chart {
+        clip-path: polygon(0 -1rem, 100% -1rem, 100% calc(100% + 0.25rem), 0 calc(100% + 0.25rem));
     }
 </style>
