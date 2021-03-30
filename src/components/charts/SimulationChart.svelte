@@ -131,7 +131,7 @@
 </script>
 
 <div class="w-full h-96 p-12 pt-0 flex flex-col">
-    <div class="flex justify-between mb-4">
+    <div class="flex flex-col items-end md:items-center md:flex-row md:justify-between mb-4">
         <div class="flex">
             {#each Object.keys(lines) as lineName, index (lineName)}
                 <ChartToggle

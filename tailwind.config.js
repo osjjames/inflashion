@@ -62,7 +62,21 @@ module.exports = {
             },
             height: {
                 'fit': 'fit-content'
+            },
+            width: {
+                'fit': 'fit-content'
+            },
+            minWidth: {
+                '2.5': '0.625rem',
+            },
+            minHeight: {
+                '2.5': '0.625rem',
             }
+        }
+    },
+    variants: {
+        extend: {
+            margin: ['last']
         }
     },
     plugins: [
