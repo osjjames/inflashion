@@ -4,6 +4,7 @@
     import {Agent} from "../utils/agent";
     import {Stake} from "../utils/protocol";
     import {precision} from "../utils/protocol";
+    import {slide} from "svelte/transition"
 
     export let agent: Agent;
     const nf = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 });
@@ -15,7 +16,7 @@
     const getProgress = (stake: Stake) => (sim.today - stake.startDay) / (stake.endDay - stake.startDay);
 </script>
 
-<div class="w-full ">
+<div class="w-full " transition:slide={{duration: 200}}>
     <span><b>{agent.name}</b></span>
     <br/>
     <span>Holdings: {(agent.holdings / precision)}</span>
