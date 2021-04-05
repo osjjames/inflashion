@@ -14,7 +14,7 @@
         agentDisplay.setSelectedAgent(selected ? null : agent.name);
     };
 
-    const props = {
+    const hoverTooltipProps = {
         allowHTML: true,
         content: "<div class='tooltip w-32'>" +
              `<div class="text-center"><b>${agent.name}</b></div>` +
@@ -28,7 +28,7 @@
 <!--<div class={`w-${widthClass} h-${widthClass} opacity-50`} class:staking={agent.activeStake?.amount > 0} use:tippy={props} class:selected on:click={select}>-->
 <!--    <IoMdPerson/>-->
 <!--</div>-->
-<div class={`w-${widthClass} h-${widthClass}`} style="opacity: {selected ? 100 : Math.round((agent.activeStake?.amount / agent.holdings) * 90) + 10}%" use:tippy={props} class:selected on:click={select}>
+<div class={`w-${widthClass} h-${widthClass} cursor-pointer`} style="opacity: {selected ? 100 : Math.round((agent.activeStake?.amount / agent.holdings) * 90) + 10}%" use:tippy={hoverTooltipProps} class:selected on:click={select}>
     <IoMdPerson/>
 </div>
 

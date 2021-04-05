@@ -179,7 +179,7 @@
                 {/if}
             {/each}
             <div class="annotation bg-flash-gray-600 bg-opacity-80 w-80 h-fit flex-col absolute whitespace-nowrap bottom-4 leading-tight rounded-lg p-2"
-                 style="left: calc({annotationOffset.x}% - 20rem); top: calc(-4rem - 1rem);">
+                 style="left: max(calc({annotationOffset.x}% - 20rem), 0rem); top: calc(0 - 1rem);">
                 <div class="w-full font-semibold">Day {closest.x}</div>
                 <div class="flex">
                     <div class="mr-3">
