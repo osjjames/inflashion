@@ -153,18 +153,18 @@
     <Chart x1={$xMin} x2={$xMax} y1={$yMin} y2={$yMax}>
         <Grid horizontal count={5} let:value>
             <div class="relative block border-b text-right border-flash-gray-300 opacity-80 border-dashed w-full">
-                <span class="absolute bottom-0.25 -left-24 pr-2 w-24 transform -translate-y-3">{abbreviateNumber(value)}</span>
+                <span class="absolute bottom-0.25 -left-24 pr-2 w-24 transform -translate-y-3 text-sm text-flash-gray-100">{abbreviateNumber(value)}</span>
             </div>
         </Grid>
 
         <Grid vertical count={5} let:value>
-            <span class="x-label">{numberWithSpaces(value)}</span>
+            <span class="x-label text-sm text-flash-gray-100">{numberWithSpaces(value)}</span>
         </Grid>
 
         <div class="line-chart w-full h-full">
             {#each Object.keys(lines) as lineName, index (lineName)}
                 {#if slicedLines[lineName].length > 1 && !linesHidden[lineName]}
-                    <ChartLine data={slicedLines[lineName]} pathClass="stroke-palette-{index+1}"/>
+                    <ChartLine data={slicedLines[lineName]} pathClass="stroke-3 stroke-palette-{index+1}"/>
                 {/if}
             {/each}
             {#if closest && sim.today > 1}
@@ -222,9 +222,6 @@
         width: 4em;
         left: -2em;
         bottom: -22px;
-        font-family: sans-serif;
-        font-size: 14px;
-        color: #888;
         text-align: center;
     }
 

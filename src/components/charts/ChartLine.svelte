@@ -17,7 +17,6 @@
     path {
         stroke-linejoin: round;
         stroke-linecap: round;
-        stroke-width: 3px;
         fill: none;
     }
 </style>

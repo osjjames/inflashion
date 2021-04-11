@@ -71,6 +71,13 @@ module.exports = {
             },
             minHeight: {
                 '2.5': '0.625rem',
+            },
+            strokeWidth: {
+                '3': '3',
+                '4': '4',
+            },
+            transformOrigin: {
+                'bottom-center': '50% 100%'
             }
         }
     },
