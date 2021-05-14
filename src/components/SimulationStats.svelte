@@ -74,15 +74,11 @@
     $: timer?.setInterval(intervalMs);
 </script>
 
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden mb-16 md:mx-8">
-    <SimulationStatCell name="Day" value="{sim.today}">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16 md:mx-8">
+    <SimulationStatCell name="Day" value="{sim.today}" icon="time">
         <span class="text-sm w-full text-center text-flash-gray-100 whitespace-nowrap overflow-hidden overflow-ellipsis">({formatDuration(sim.today)})</span>
     </SimulationStatCell>
-    <SimulationStatCell name="FPY" value="{(sim.protocol.fpy*100).toFixed(2)} %"/>
-    <SimulationStatCell name="FPY Match" value="{($fpyMatch * 100).toFixed(0)} %">
-        <Slider inputClass={`w-36`} min="0.02" max="0.2" step="0.01" bind:value={$fpyMatch}></Slider>
-    </SimulationStatCell>
-    <SimulationStatCell name="Speed">
+    <SimulationStatCell name="Speed" icon="speed">
         <div>
             <span class="text-xl">{$speed.toFixed(0)}&nbsp;</span>
             <span class="text-sm">days per second</span>
@@ -92,9 +88,13 @@
             <span class="text-sm text-flash-gray-100">Actual: {actualSpeed}</span>
         {/if}
     </SimulationStatCell>
-    <SimulationStatCell name="Total Supply" value="{(sim.protocol.totalSupply / precision).toFixed(0)}"/>
-    <SimulationStatCell name="Total Staked" value="{(sim.protocol.totalStaked / precision).toFixed(0)}"/>
-    <SimulationStatCell name="Total Matched" value="{(sim.protocol.totalMatched / precision).toFixed(0)}"/>
+    <SimulationStatCell name="FPY" value="{(sim.protocol.fpy*100).toFixed(2)} %" icon="fpy" joinedRight/>
+    <SimulationStatCell name="FPY Match" value="{($fpyMatch * 100).toFixed(0)} %" joinedLeft>
+        <Slider inputClass={`w-36`} min="0.02" max="0.2" step="0.01" bind:value={$fpyMatch}></Slider>
+    </SimulationStatCell>
+    <SimulationStatCell name="Total Supply" value="{(sim.protocol.totalSupply / precision).toFixed(0)}" icon="total" joinedRight/>
+    <SimulationStatCell name="Total Staked" value="{(sim.protocol.totalStaked / precision).toFixed(0)}" joinedLeft joinedRight/>
+    <SimulationStatCell name="Total Matched" value="{(sim.protocol.totalMatched / precision).toFixed(0)}" joinedLeft/>
     <div class="flex justify-center items-center">
         <Button onClick={togglePause} width={40} height={16}>{buttonText}</Button>
     </div>

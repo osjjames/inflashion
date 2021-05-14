@@ -79,15 +79,4 @@
         @apply bg-flash-gradient rounded-2xl shadow-flash-blue inline-block h-full;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) inset;
     }
-
-    .border-icon {
-        top: -20px;
-        left: 20px;
-        border: 10px solid #1B1A1F;
-        z-index: 1;
-        height: 40px;
-        width: 40px;
-        position: absolute;
-        border-radius: 50px;
-    }
 </style>
