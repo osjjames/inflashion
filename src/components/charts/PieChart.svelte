@@ -29,13 +29,13 @@
         }
     }
 </script>
-<div class="h-16 w-16 relative rounded-full overflow-hidden">
+<div class="h-10 w-10 relative rounded-full overflow-hidden">
     {#each normalisedSegments as segment, index}
         <div class="pie-segment"
             style="--degrees: {segment.degrees}; --offset: {segment.offset}; --color: {segment.color}; --over50: {segment.degrees > 180 ? 1 : 0}">
         </div>
     {/each}
-    <div class="bg-flash-gray-900 h-8 w-8 absolute rounded-full" style="top: 25%; left: 25%; z-index: 100"/>
+    <div class="bg-flash-gray-900 h-5 w-5 absolute rounded-full" style="top: 25%; left: 25%; z-index: 100"/>
 </div>
 
 <style>
