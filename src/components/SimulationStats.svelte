@@ -10,6 +10,8 @@
     import Button from "./input/Button.svelte";
     import SimulationStatCell from "./SimulationStatCell.svelte";
     import Slider from "./input/Slider.svelte";
+    import IoIosPlay from 'svelte-icons/io/IoIosPlay.svelte';
+    import IoIosPause from 'svelte-icons/io/IoIosPause.svelte';
 
     $: sim = $simulation;
 
@@ -96,7 +98,14 @@
     <SimulationStatCell name="Total Staked" value="{(sim.protocol.totalStaked / precision).toFixed(0)}" joinedLeft joinedRight/>
     <SimulationStatCell name="Total Matched" value="{(sim.protocol.totalMatched / precision).toFixed(0)}" joinedLeft/>
     <div class="flex justify-center items-center">
-        <Button onClick={togglePause} width={40} height={16}>{buttonText}</Button>
+        <Button onClick={togglePause} width={44} height={16}>
+            <div class="flex items-center justify-center">
+                <div class="h-8 w-8 mr-1">
+                    {#if buttonText.toLowerCase() === 'pause'}<IoIosPause></IoIosPause>{:else}<IoIosPlay></IoIosPlay>{/if}
+                </div>
+                <span>{buttonText}</span>
+            </div>
+        </Button>
     </div>
 
 </div>

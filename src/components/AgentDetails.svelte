@@ -27,14 +27,15 @@
     }
 </script>
 
-<div class="w-full max-w-xs overflow-hidden p-3 border-2 border-flash-gray-600 rounded-2xl" transition:slide={{duration: 200}}>
-    <div class="w-full text-center mb-3"><b>{agent.name}</b></div>
-
-    <div class="flex justify-between mb-4">
-        <span>Net worth</span>
-        <span>{Math.round(agent.holdings / precision)} $FLASH</span>
+<div class="w-full max-w-xs overflow-hidden p-3 border-2 border-flash-gray-600 rounded-2xl h-72 flex flex-col justify-between">
+    <div>
+        <div class="w-full text-center mb-3"><b>{agent.name}</b></div>
+        <div class="flex justify-between mb-4">
+            <span>Net worth</span>
+            <span>{Math.round(agent.holdings / precision)} $FLASH</span>
+        </div>
     </div>
-    <div class="w-full relative p-3 border-2 border-flash-gray-600 rounded-2xl h-44">
+    <div class="w-full relative p-3 border-2 border-flash-gray-600 rounded-2xl">
         {#if agent.activeStake && agent.activeStake.amount > 0}
             <div class="flex justify-between">
                 <div class="flex flex-col">
