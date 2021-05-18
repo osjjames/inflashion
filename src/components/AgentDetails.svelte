@@ -27,7 +27,7 @@
     }
 </script>
 
-<div class="w-full overflow-hidden p-3 border-2 border-flash-gray-600 rounded-2xl" transition:slide={{duration: 200}}>
+<div class="w-full max-w-xs overflow-hidden p-3 border-2 border-flash-gray-600 rounded-2xl" transition:slide={{duration: 200}}>
     <div class="w-full text-center mb-3"><b>{agent.name}</b></div>
 
     <div class="flex justify-between mb-4">

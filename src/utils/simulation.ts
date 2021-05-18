@@ -12,12 +12,14 @@ export type SimulationParameters = {
 }
 type ParameterProps = {
     name: string,
+    description: string,
     distribution: TruncatedNormalDistribution,
     messageGenerator: MessageGenerator
 }
 export type MessageGenerator = (mu: number, sigma: number, bounds: Bounds, area: number) => string;
 export class Parameter {
     readonly name: string;
+    readonly description: string;
     private _distribution: TruncatedNormalDistribution;
     readonly messageGenerator: MessageGenerator;
 
@@ -25,6 +27,7 @@ export class Parameter {
 
     constructor(props: ParameterProps) {
         this.name = props.name;
+        this.description = props.description;
         this._distribution = props.distribution;
         this.messageGenerator = props.messageGenerator;
     }

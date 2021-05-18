@@ -32,6 +32,7 @@ export const simulation = createSimulation(new Simulation({
 export const parameters = createParameters({
     stakeProportion: (new Parameter({
         name: 'Stake Proportion',
+        description: 'How much will people stake?',
         distribution: {
             bounds: {lower: 0, upper: 1},
             mu: 0.5,
@@ -52,6 +53,7 @@ export const parameters = createParameters({
     })),
     stakeDuration: (new Parameter({
         name: 'Stake Duration',
+        description: 'How long will people stake for?',
         distribution: {
             bounds: {lower: 0, upper: 1},
             mu: 0.7,
@@ -66,12 +68,13 @@ export const parameters = createParameters({
                         default: return `Everybody will stake for ${(mu*100).toFixed(0)}% of the maximum stake duration.`;
                     }})();
                 case Infinity: return 'Everybody will stake for a random duration.';
-                default: return `${(area*100).toFixed(1)}% of people will stake for ${(bounds.lower*100).toFixed(0)}-${(bounds.upper*100).toFixed(0)}% of the maximum stake duration`;
+                default: return `${(area*100).toFixed(1)}% of people will stake for ${(bounds.lower*100).toFixed(0)}-${(bounds.upper*100).toFixed(0)}% of the maximum stake duration.`;
             }
         })
     })),
     stakeCompletion: (new Parameter({
         name: 'Stake Completion',
+        description: 'How early will people unstake?',
         distribution: {
             bounds: {lower: 0, upper: 1},
             mu: 0.8,

@@ -8,5 +8,7 @@
         bind:mu={$parameters[parameter].distribution.mu}
         bind:sigma={$parameters[parameter].distribution.sigma}
         getMessage={$parameters[parameter].messageGenerator}
+        name={$parameters[parameter].name}
+        description={$parameters[parameter].description}
     />
 {/each}
