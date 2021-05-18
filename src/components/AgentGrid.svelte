@@ -15,7 +15,7 @@
     $: remainder = population % peoplePerRow;
 </script>
 
-<div class="grid box-border mb-4 mr-8" style={`grid-template-columns: repeat(${peoplePerRow}, minmax(0, 1fr))`}>
+<div class="grid box-border mb-4 lg:mr-8" style={`grid-template-columns: repeat(${peoplePerRow}, minmax(0, 1fr))`}>
     {#each agents as agent,i}
         <div transition:scale="{{duration: 200}}">
             <AgentCell {agent}/>

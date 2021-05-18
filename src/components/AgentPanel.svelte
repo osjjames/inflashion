@@ -13,7 +13,7 @@
     $: selectedAgent = sim.agents.find(a => a.name === agentDisplayStore.selectedAgentName);
 </script>
 
-<div class="w-full items-center flex flex-col lg:flex-row lg:justify-center mb-8">
+<div class="w-full items-center flex flex-col lg:flex-row lg:justify-center">
     <AgentGrid population={sim.agents.length} {maxPopulation} agents={sim.agents}/>
     {#if selectedAgent}
         <AgentDetails agent={selectedAgent}/>
